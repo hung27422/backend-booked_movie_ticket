@@ -1,7 +1,7 @@
 const userRoute = require("./auht");
 const route = (app) => {
   app.get("/", (req, res) => {
-    res.send("Hello World!");
+    res.send("SERVER ON");
   });
   app.use("/api/auth", userRoute);
 };

@@ -5,6 +5,7 @@ const port = 5000;
 const route = require("./src/routes/index");
 const db = require("./src/configs/db/index");
 
+app.use(express.json());
 // Connect to database
 db.connect();
 
