@@ -14,12 +14,13 @@ const MovieSchema = new Schema({
   rating: { type: Number }, // Đánh giá
   ageRate: { type: Number }, // Độ tuổi
   country: { type: String }, // Quốc gia
-  caption: { type: String }, // Phu đề
+  caption: { type: String }, // Phụ đề
   status: {
     type: String,
     enum: ["nowShowing", "comingSoon", "temporarilyClosed"],
     default: "nowShowing",
   },
+  user: { type: Schema.Types.ObjectId, ref: "User" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

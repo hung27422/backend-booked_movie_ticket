@@ -16,24 +16,17 @@ class UserController {
 
   //[POST] /api/auth/register
   async register(req, res) {
-    const { username, password, email, fullName, phone } = req.body;
+    const { username, password, email, fullName, phone, role } = req.body;
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing username and/or password" });
+      return res.status(400).json({ success: false, message: "Missing username and/or password" });
     }
     try {
       //Check for existing user
       const user = await User.findOne({ username });
       const emailExit = await User.findOne({ email });
-      if (user)
-        return res
-          .status(400)
-          .json({ success: false, message: "Username already taken" });
+      if (user) return res.status(400).json({ success: false, message: "Username already taken" });
       if (emailExit) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Email already taken" });
+        return res.status(400).json({ success: false, message: "Email already taken" });
       }
       // All good
       const hashedPassword = await argon2.hash(password);
@@ -43,12 +36,13 @@ class UserController {
         email,
         fullName,
         phone,
+        role,
       });
       await newUser.save();
 
       //Return JWT token
       const accessToken = jwt.sign(
-        { userID: newUser._id },
+        { userID: newUser._id, role: newUser.role },
         process.env.ACCESS_TOKEN,
         { expiresIn: "100h" }
       );
@@ -66,9 +60,7 @@ class UserController {
   async login(req, res) {
     const { username, password } = req.body;
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing username and/or password" });
+      return res.status(400).json({ success: false, message: "Missing username and/or password" });
     }
     try {
       //Check for existing user
@@ -88,11 +80,9 @@ class UserController {
       }
       // All good
       //Return JWT token
-      const accessToken = jwt.sign(
-        { userID: user._id },
-        process.env.ACCESS_TOKEN,
-        { expiresIn: "100h" }
-      );
+      const accessToken = jwt.sign({ userID: user._id }, process.env.ACCESS_TOKEN, {
+        expiresIn: "100h",
+      });
       res.json({
         success: true,
         message: "Login successful",

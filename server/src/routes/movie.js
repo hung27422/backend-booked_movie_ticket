@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const movieController = require("../app/controller/MovieController");
-const verifyToken = require("../middleware/auth");
-// [POST] /api/movies
-router.use("/", verifyToken, movieController.post);
+const { verifyAdmin, verifyToken } = require("../middleware/auth");
 // [GET] /api/movies
-// router.use("/", movieController.index);
+router.get("/", movieController.index);
+// [PUT] /api/movies/:id
+router.put("/:id", verifyToken, verifyAdmin, movieController.put);
+// [POST] /api/movies
+router.use("/", verifyToken, verifyAdmin, movieController.post);
 
 module.exports = router;

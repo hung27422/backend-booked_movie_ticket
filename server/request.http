@@ -3,9 +3,9 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "tanhunghoo4",
+  "username": "tanhungho9",
   "password": "123456",
-  "email": "hung4@gmail.com", 
+  "email": "hung9@gmail.com", 
   "fullName": "Hùng Hồ",
   "phone": "0987654321",
   "role": "user"
@@ -22,13 +22,13 @@ Content-Type: application/json
 ###
 POST http://localhost:5000/api/movies
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2IzMTA1NzE3Mjc0NWUzODZlYWQwNWQiLCJpYXQiOjE3Mzk4ODU3NjcsImV4cCI6MTc0MDI0NTc2N30.hZlMTuK1hD73sXe3OS-dQGKNM06YmDHLWy-BXkhNg2c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
 
 {
-  "title": "The Shawshank Redemption 1",
+  "title": "Test 1",
   "description": "Two imprisoned men bond over a debt due to familial disputes after having been released from prison.",
   "duration": 142,
-  "genres": ["Drama", "Crime"],
+  "genre": ["Drama", "Crime"],
   "releaseDate": "1994-10-14",
   "director": "Frank Darabont",
   "cast": ["Frank Darabont", "Christopher Nolan", "Anurag Kashyap"],
@@ -41,3 +41,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2IzM
   "status": "nowShowing"
 }
 
+###
+PUT http://localhost:5000/api/movies/67b4851ff867fb27085bcbaf
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+
+{
+  "title": "Test Update Movie 1234",
+  "description": "Two imprisoned men bond over a debt due to familial disputes after having been released from prison.",
+  "duration": 142,
+  "genre": ["Drama", "Crime"],
+  "releaseDate": "1994-10-14",
+  "director": "Frank Darabont",
+  "cast": ["Frank Darabont", "Christopher Nolan", "Anurag Kashyap"],
+  "poster": "https://www.imdb.com/title/tt0111161/mediaviewer/rm2488754688/",
+  "trailer": "https://www.youtube.com/watch?v=6hB3S9bIaco",
+  "rating": 9.3,
+  "ageRate": 18,
+  "country": "USA",
+  "caption": "English",
+  "status": "nowShowing"
+}
