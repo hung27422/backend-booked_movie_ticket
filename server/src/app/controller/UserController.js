@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 class UserController {
   //[GET] /api/auth
   index(req, res) {
+    // res.send("User Route");
     User.find({})
       .then((user) => res.json(user)) // ✅ Return list user
       .catch((err) => {
@@ -60,7 +61,7 @@ class UserController {
       console.error(err);
     }
   }
-  
+
   //[POST] /api/auth/login
   async login(req, res) {
     const { username, password } = req.body;

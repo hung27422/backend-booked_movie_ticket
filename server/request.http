@@ -1,19 +1,43 @@
-POST  http://localhost:5000/api/auth/register
+
+POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "tanhungho2",
+  "username": "tanhunghoo4",
   "password": "123456",
-  "email": "hung2@gmail.com", 
+  "email": "hung4@gmail.com", 
   "fullName": "Hùng Hồ",
   "phone": "0987654321",
   "role": "user"
 }
 ###
-POST  http://localhost:5000/api/auth/login
+POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
   "username": "tanhungho2",
-    "password": "123456"
+  "password": "123456"
 }
+
+###
+POST http://localhost:5000/api/movies
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2IzMTA1NzE3Mjc0NWUzODZlYWQwNWQiLCJpYXQiOjE3Mzk4ODU3NjcsImV4cCI6MTc0MDI0NTc2N30.hZlMTuK1hD73sXe3OS-dQGKNM06YmDHLWy-BXkhNg2c
+
+{
+  "title": "The Shawshank Redemption 1",
+  "description": "Two imprisoned men bond over a debt due to familial disputes after having been released from prison.",
+  "duration": 142,
+  "genres": ["Drama", "Crime"],
+  "releaseDate": "1994-10-14",
+  "director": "Frank Darabont",
+  "cast": ["Frank Darabont", "Christopher Nolan", "Anurag Kashyap"],
+  "poster": "https://www.imdb.com/title/tt0111161/mediaviewer/rm2488754688/",
+  "trailer": "https://www.youtube.com/watch?v=6hB3S9bIaco",
+  "rating": 9.3,
+  "ageRate": 18,
+  "country": "USA",
+  "caption": "English",
+  "status": "nowShowing"
+}
+
