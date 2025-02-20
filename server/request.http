@@ -3,9 +3,9 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "tanhungho9",
+  "username": "tanhungho10",
   "password": "123456",
-  "email": "hung9@gmail.com", 
+  "email": "hung10@gmail.com", 
   "fullName": "Hùng Hồ",
   "phone": "0987654321",
   "role": "user"
@@ -25,7 +25,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
 
 {
-  "title": "Test 1",
+  "title": "Test 2",
   "description": "Two imprisoned men bond over a debt due to familial disputes after having been released from prison.",
   "duration": 142,
   "genre": ["Drama", "Crime"],
@@ -62,3 +62,69 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0Y
   "caption": "English",
   "status": "nowShowing"
 }
+
+###
+DELETE  http://localhost:5000/api/movies/67b4cfeef89ea6a05e9ed154
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+
+###
+// Tạo room
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+
+{
+  "name": "Room 3",
+  "cinemaId": "67b75651ba9c7545a6904cea",
+  "seats": [
+    {
+      "seatNumber": 1,
+      "isBooked": false
+    },
+    {
+      "seatNumber": 2,
+      "isBooked": false
+    },
+    {
+      "seatNumber": 2,
+      "isBooked": false
+    }
+  ]
+}
+###
+// Xóa Room
+DELETE http://localhost:5000/api/rooms/67b75667ba9c7545a6904cee
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+###
+//Tạo Cinema
+POST http://localhost:5000/api/cinemas
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+
+{
+  "name": "Cinema 6",
+  "location": "Hồ Chí Minh",
+  "phone": "0987654321",
+  "rooms": ["67b756f1ba9c7545a6904d14","67b756aeba9c7545a6904cff"]
+}
+
+###
+//Update Cinema
+
+PUT http://localhost:5000/api/cinemas/67b74e8c74613370fa3dff12
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+ 
+{
+  "name": "Cinema 3 test",
+  "location": "Hồ Chí Minh",
+  "phone": "0987654321",
+  "rooms": ["67b741f3ada8613e2bdf4a65"]
+}
+###
+// Xóa Cinema
+DELETE http://localhost:5000/api/cinemas/67b748b7acc66114daa11dce
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc

@@ -132,5 +132,27 @@ class MovieController {
       });
     }
   }
+  // [DELETE] /api/movies/:id
+  async delete(req, res) {
+    const { id } = req.params;
+    try {
+      const movieDeleteCondition = { _id: id };
+      const deleteMovie = await Movie.findOneAndDelete(movieDeleteCondition);
+      //User not authorised or movie not found
+      if (!deleteMovie) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Movie not found or user not authorised" });
+      }
+      // Movie deleted successfully
+      res.json({ success: true, message: "Movie deleted successfully", movie: deleteMovie });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
 }
 module.exports = new MovieController();

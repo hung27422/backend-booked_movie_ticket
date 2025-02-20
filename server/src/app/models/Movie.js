@@ -17,8 +17,8 @@ const MovieSchema = new Schema({
   caption: { type: String }, // Phụ đề
   status: {
     type: String,
-    enum: ["nowShowing", "comingSoon", "temporarilyClosed"],
-    default: "nowShowing",
+    enum: ["NOWSHOWING", "COMINGSOON", "TEMPORARILYCLOSED"],
+    default: "NOWSHOWING",
   },
   user: { type: Schema.Types.ObjectId, ref: "User" },
   createdAt: { type: Date, default: Date.now },
