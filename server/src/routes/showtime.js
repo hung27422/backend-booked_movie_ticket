@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const showTimeController = require("../app/controller/ShowtimeController");
-const { verifyAdmin, verifyToken } = require("../middleware/auth");
 // [GET] /api/movies
 router.get("/", showTimeController.index);
 // [DELETE] /api/showtimes/:id

@@ -163,3 +163,35 @@ Content-Type: application/json
 // Xóa lich chiếu
 DELETE http://localhost:5000/api/showtimes/67bd764f6ff496f671cf33cc
 Content-Type: application/json
+
+###
+//Booking vé
+POST http://localhost:5000/api/bookings
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
+
+{
+  "userId": "67b300f3a14c448fe3ce2fb6",
+  "showtimeId": "67bd7a57bb5723b4c3b7afc3",
+  "seatNumbers": ["A1", "A2"],
+  "totalPrice": 160000,
+  "status": "PENDING"
+}
+
+###
+//Update Booking
+PUT http://localhost:5000/api/bookings/67bd960966ce96f854b4ebcc
+Content-Type: application/json
+
+{
+  "userId": "67b300f3a14c448fe3ce2fb6",
+  "showtimeId": "67bd7a57bb5723b4c3b7afc3",
+  "seatNumbers": ["A2", "A4"],
+  "totalPrice": 160000,
+  "status": "CONFIRMED"
+}
+
+###
+//Xóa Booking
+DELETE http://localhost:5000/api/bookings/67bd94b641c08accb9a58a4e
+Content-Type: application/json
