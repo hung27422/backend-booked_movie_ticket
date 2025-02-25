@@ -4,6 +4,7 @@ const cinemaRoute = require("./cinema");
 const roomRoute = require("./room");
 const showTimeRoute = require("./showtime");
 const bookingRoute = require("./booking");
+const paymentRoute = require("./payment");
 const route = (app) => {
   //Home Router
   app.get("/", (req, res) => {
@@ -21,5 +22,7 @@ const route = (app) => {
   app.use("/api/showtimes", showTimeRoute);
   // Booking
   app.use("/api/bookings", bookingRoute);
+  // Payment
+  app.use("/api/payments", paymentRoute);
 };
 module.exports = route;

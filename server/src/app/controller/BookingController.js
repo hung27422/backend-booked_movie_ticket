@@ -10,7 +10,7 @@ class BookingController {
   }
   // [POST] /api/bookings
   async post(req, res) {
-    const { userId, showtimeId, seatNumbers, status } = req.body;
+    const { userId, showtimeId, seatNumbers, totalPrice, status } = req.body;
     // Simple validation
     if (!userId || !showtimeId || !seatNumbers) {
       return res.status(400).json({ msg: "Please enter all fields" });
@@ -20,6 +20,7 @@ class BookingController {
         userId,
         showtimeId,
         seatNumbers,
+        totalPrice,
         status,
       });
       await newBooking.save();
@@ -32,7 +33,7 @@ class BookingController {
   // [PUT] /api/bookings/:id
   async put(req, res) {
     const { id } = req.params;
-    const { userId, showtimeId, seatNumbers, status } = req.body;
+    const { userId, showtimeId, seatNumbers, totalPrice, status } = req.body;
     // Simple validation
     if (!userId || !showtimeId || !seatNumbers) {
       return res.status(400).json({ msg: "Please enter all fields" });
@@ -42,6 +43,7 @@ class BookingController {
         userId,
         showtimeId,
         seatNumbers,
+        totalPrice,
         status,
       };
       const bookingUpdateCondition = { _id: id };

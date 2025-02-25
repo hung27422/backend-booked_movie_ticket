@@ -173,7 +173,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkN
 {
   "userId": "67b300f3a14c448fe3ce2fb6",
   "showtimeId": "67bd7a57bb5723b4c3b7afc3",
-  "seatNumbers": ["A1", "A2"],
+  "seatNumbers": ["B1", "B2"],
   "totalPrice": 160000,
   "status": "PENDING"
 }
@@ -194,4 +194,35 @@ Content-Type: application/json
 ###
 //Xóa Booking
 DELETE http://localhost:5000/api/bookings/67bd94b641c08accb9a58a4e
+Content-Type: application/json
+
+###
+//Payment
+
+POST http://localhost:5000/api/payments
+Content-Type: application/json
+
+{
+  "userId": "67b300f3a14c448fe3ce2fb6",
+  "bookingId": "67bdafa8c83fd0a104afaed8",
+  "paymentMethod": "CASH",
+  "amount": 160000,
+  "status": "PENDING"
+}
+###
+//Update Payment
+PUT http://localhost:5000/api/payments/67bdafc0c83fd0a104afaede
+Content-Type: application/json
+
+{
+  "userId": "67b300f3a14c448fe3ce2fb6",
+  "bookingId": "67bdafa8c83fd0a104afaed8",
+  "paymentMethod": "CASH",
+  "amount": 180000,
+  "status": "CONFIRMED"
+}
+
+###
+//Xóa Payment
+DELETE http://localhost:5000/api/payments/67bdad8664c0f9579d6a3574
 Content-Type: application/json
