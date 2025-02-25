@@ -3,12 +3,12 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "tanhungho10",
+  "username": "tanhungho11",
   "password": "123456",
-  "email": "hung10@gmail.com", 
+  "email": "hung11@gmail.com", 
   "fullName": "Hùng Hồ",
   "phone": "0987654321",
-  "role": "user"
+  "role": "admin"
 }
 ###
 POST http://localhost:5000/api/auth/login
@@ -22,10 +22,10 @@ Content-Type: application/json
 ###
 POST http://localhost:5000/api/movies
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
 
 {
-  "title": "Test 2",
+  "title": "Test 5",
   "description": "Two imprisoned men bond over a debt due to familial disputes after having been released from prison.",
   "duration": 142,
   "genre": ["Drama", "Crime"],
@@ -44,7 +44,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0Y
 ###
 PUT http://localhost:5000/api/movies/67b4851ff867fb27085bcbaf
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
 
 {
   "title": "Test Update Movie 1234",
@@ -66,13 +66,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0Y
 ###
 DELETE  http://localhost:5000/api/movies/67b4cfeef89ea6a05e9ed154
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
 
 ###
 // Tạo room
 POST http://localhost:5000/api/rooms
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
 
 {
   "name": "Room 3",
@@ -96,15 +96,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0Y
 // Xóa Room
 DELETE http://localhost:5000/api/rooms/67b75667ba9c7545a6904cee
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
 ###
 //Tạo Cinema
 POST http://localhost:5000/api/cinemas
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
 
 {
-  "name": "Cinema 6",
+  "name": "Cinema 7",
   "location": "Hồ Chí Minh",
   "phone": "0987654321",
   "rooms": ["67b756f1ba9c7545a6904d14","67b756aeba9c7545a6904cff"]
@@ -115,7 +115,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0Y
 
 PUT http://localhost:5000/api/cinemas/67b74e8c74613370fa3dff12
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
  
 {
   "name": "Cinema 3 test",
@@ -127,4 +127,39 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0Y
 // Xóa Cinema
 DELETE http://localhost:5000/api/cinemas/67b748b7acc66114daa11dce
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2I0YzBjNmRiOThlYzg3ZGMyZGZjZDkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk4OTkwNzgsImV4cCI6MTc0MDI1OTA3OH0.66lW5r3sRHk5JlhEPt2WJJvfYKBdfvdCJ9wApEkltgc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2N2JkNzVjOTZmZjQ5NmY2NzFjZjMzYmYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDA0Njk3MDUsImV4cCI6MTc0MDgyOTcwNX0.XB5dSdifpNinwIliPc-5UTkPbPZyeSYnVlP70SGNocg
+
+###
+// Tạo lich chiếu
+POST http://localhost:5000/api/showtimes
+Content-Type: application/json
+
+{
+  "movieId": "67b4851ff867fb27085bcbaf",
+  "cinemaId": "67b7521e3fdf55ed1ff42586",
+  "roomId": "67b741f3ada8613e2bdf4a65",
+  "startTime": "2025-02-25T07:50:21.173Z",
+  "endTime": "2025-02-25T07:50:21.173Z",
+  "price": 160000,
+  "availableSeats": 50
+}
+
+###
+// Update lich chiếu
+PUT http://localhost:5000/api/showtimes/67bd764f6ff496f671cf33cc
+Content-Type: application/json
+
+{
+  "movieId": "67b4851ff867fb27085bcbaf",
+  "cinemaId": "67b7521e3fdf55ed1ff42586",
+  "roomId": "67b741f3ada8613e2bdf4a65",
+  "startTime": "2025-02-25T07:50:21.173Z",
+  "endTime": "2025-02-25T07:50:21.173Z",
+  "price": 150000,
+  "availableSeats": 100
+}
+
+###
+// Xóa lich chiếu
+DELETE http://localhost:5000/api/showtimes/67bd764f6ff496f671cf33cc
+Content-Type: application/json

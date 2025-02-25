@@ -13,10 +13,10 @@ const ShowtimeSchema = new Schema({
   startTime: { type: Date, required: true }, // Thời gian bắt đầu
   endTime: { type: Date, required: true }, // Thời gian kết thúc
   price: { type: Number, required: true }, // Giá vé
-  availableSeats: { type: [SeatSchema], required: true }, // Danh sách ghế còn trống
+  availableSeats: { type: Number, required: true }, // Danh sách ghế còn trống
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
 // Mongoose sẽ tự động tạo collection "rooms" nếu chưa có
-module.exports = mongoose.model("Room", ShowtimeSchema);
+module.exports = mongoose.model("ShowTime", ShowtimeSchema);
