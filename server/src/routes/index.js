@@ -5,6 +5,7 @@ const roomRoute = require("./room");
 const showTimeRoute = require("./showtime");
 const bookingRoute = require("./booking");
 const paymentRoute = require("./payment");
+const reviewRoute = require("./review");
 const route = (app) => {
   //Home Router
   app.get("/", (req, res) => {
@@ -18,11 +19,13 @@ const route = (app) => {
   app.use("/api/cinemas", cinemaRoute);
   // Room Router
   app.use("/api/rooms", roomRoute);
-  // Showtime
+  // Showtime Router
   app.use("/api/showtimes", showTimeRoute);
-  // Booking
+  // Booking Router
   app.use("/api/bookings", bookingRoute);
-  // Payment
+  // Payment Router
   app.use("/api/payments", paymentRoute);
+  // Review Router
+  app.use("/api/reviews", reviewRoute);
 };
 module.exports = route;

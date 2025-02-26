@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 // Rạp chiếu phim
 const CinemaSchema = new Schema({
   name: { type: String, required: true, unique: true },
+  cinemaCode: { type: String, required: true, unique: true },
   location: { type: String, required: true },
   phone: { type: String },
   rooms: [{ type: Schema.Types.ObjectId, ref: "Room" }],

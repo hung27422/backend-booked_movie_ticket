@@ -36,7 +36,7 @@ class CinemaController {
   // [PUT] /api/cinemas/:id
   async put(req, res) {
     const { id } = req.params;
-    const { name, location, phone, rooms } = req.body;
+    const { name, cinemaCode, location, phone, rooms } = req.body;
     // Simple validation
     if (!name) {
       return res.status(400).json({
@@ -47,6 +47,7 @@ class CinemaController {
     try {
       let updateCinema = {
         name,
+        cinemaCode,
         location,
         phone,
         rooms,
