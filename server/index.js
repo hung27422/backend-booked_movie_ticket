@@ -1,10 +1,12 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const port = 5000;
 
 const route = require("./src/routes/index");
 const db = require("./src/configs/db/index");
 
+app.use(cors());
 app.use(express.json());
 
 // Connect to database

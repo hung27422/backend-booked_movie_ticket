@@ -4,27 +4,27 @@ class CinemaController {
   //[GET] /api/cinemas
   index(req, res) {
     Cinema.find({})
-      .populate("rooms", "name seats type")
       .then((cinemas) => res.json(cinemas))
       .catch((error) => res.status(400).json({ error: error.message }));
   }
   // [POST] /api/cinemas
   async post(req, res) {
-    const { name, location, phone, rooms } = req.body;
+    const { name, cinemaCode, image, location, phone } = req.body;
 
     // Simple validation
-    if (!name || !location || !rooms) {
+    if (!name || !location) {
       return res.status(400).json({
         success: false,
-        message: "Name, location and rooms are required",
+        message: "Name, location are required",
       });
     }
     try {
       const newCinema = new Cinema({
         name,
+        cinemaCode,
+        image,
         location,
         phone,
-        rooms,
       });
       await newCinema.save();
       // Create new cinema successfully
@@ -36,7 +36,7 @@ class CinemaController {
   // [PUT] /api/cinemas/:id
   async put(req, res) {
     const { id } = req.params;
-    const { name, cinemaCode, location, phone, rooms } = req.body;
+    const { name, image, cinemaCode, location, phone } = req.body;
     // Simple validation
     if (!name) {
       return res.status(400).json({
@@ -47,10 +47,10 @@ class CinemaController {
     try {
       let updateCinema = {
         name,
+        image,
         cinemaCode,
         location,
         phone,
-        rooms,
       };
       const cinemaUpdateCondition = { _id: id };
       updateCinema = await Cinema.findOneAndUpdate(cinemaUpdateCondition, updateCinema, {

@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const movieController = require("../app/controller/MovieController");
 const { verifyAdmin, verifyToken } = require("../middleware/auth");
+
+// [GET] /api/movie/:id
+router.get("/:id", movieController.getMovieById);
 // [GET] /api/movies
 router.get("/", movieController.index);
 //[DELETE] /api/movies/:id

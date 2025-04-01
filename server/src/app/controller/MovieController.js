@@ -1,5 +1,24 @@
 const Movie = require("../models/Movie");
 class MovieController {
+  //[GET] /api/movie/id
+  async getMovieById(req, res) {
+    const movieId = req.params.id;
+    Movie.findById(movieId)
+      .populate("user", "username fullName")
+      .then((movie) => {
+        if (!movie) {
+          return res.status(404).json({
+            success: false,
+            message: "Movie not found",
+          });
+        }
+        res.json(movie);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: "Lỗi server" });
+      });
+  }
   //[GET] /api/movies
   index(req, res) {
     Movie.find({})
@@ -26,6 +45,7 @@ class MovieController {
       ageRate,
       country,
       caption,
+      status,
     } = req.body;
     const userId = req.userId;
     // Simple validation
@@ -51,6 +71,7 @@ class MovieController {
         ageRate,
         country,
         caption,
+        status,
         user: userId,
       });
 
@@ -86,6 +107,7 @@ class MovieController {
       ageRate,
       country,
       caption,
+      status,
     } = req.body;
     // Simple validation
     if (!title || !description) {
@@ -109,6 +131,7 @@ class MovieController {
         ageRate,
         country,
         caption,
+        status,
       };
       const movieUpdateCondition = { _id: id };
       updateMovie = await Movie.findOneAndUpdate(movieUpdateCondition, updateMovie, { new: true });

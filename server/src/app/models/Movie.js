@@ -11,7 +11,7 @@ const MovieSchema = new Schema({
   cast: { type: [String] }, // Diễn viên
   poster: { type: String },
   trailer: { type: String },
-  rating: { type: Number }, // Đánh giá
+  rating: { type: Number }, // Đánh giá 
   ageRate: { type: Number }, // Độ tuổi
   country: { type: String }, // Quốc gia
   caption: { type: String }, // Phụ đề

@@ -1,18 +1,34 @@
+const { generateSeats } = require("../../utils/seatUtils");
 const Room = require("../models/Room");
 class RoomController {
   index(req, res) {
     Room.find({})
-      .populate("cinemaId", "name")
       .then((rooms) => {
-        res.json(rooms);
+        // Xử lý từng room để thêm số hàng và số cột
+        const updatedRooms = rooms.map((room) => {
+          const seats = room.seats;
+          const rows = Math.max(...seats.map((s) => s.position.row)); // Lấy hàng lớn nhất
+          const cols = Math.max(...seats.map((s) => s.position.col)); // Lấy cột lớn nhất
+
+          return {
+            ...room.toObject(), // Chuyển Mongoose document thành Object
+            rows,
+            cols,
+            doubleSeatRow: room.doubleSeatRow || 0, // Số hàng ghế đôi
+            aisleCols: room.aisleCols || [], // Khoảng cách giữa ghế
+          };
+        });
+
+        res.json(updatedRooms);
       })
       .catch((error) => {
-        res.status(400).json({ error: error });
+        res.status(400).json({ error: error.message });
       });
   }
+
   // [POST] /api/Rooms
   async post(req, res) {
-    const { name, cinemaId, seats, type } = req.body;
+    const { name, cinemaId, rows, cols, aisleCols, doubleSeatRow, type } = req.body;
 
     // Simple validation
     if (!name) {
@@ -22,11 +38,16 @@ class RoomController {
       });
     }
     try {
+      const seats = generateSeats(rows, cols, aisleCols, doubleSeatRow);
       const newRoom = new Room({
         name,
         cinemaId,
         seats,
         type,
+        rows,
+        cols,
+        doubleSeatRow,
+        aisleCols,
       });
       await newRoom.save();
       // Create new Room successfully
@@ -38,7 +59,7 @@ class RoomController {
   // [PUT] /api/rooms/:id
   async put(req, res) {
     const { id } = req.params;
-    const { name, cinemaId, seats, type } = req.body;
+    const { name, cinemaId, rows, cols, aisleCols, doubleSeatRow, type } = req.body;
     // Simple validation
     if (!name) {
       return res.status(400).json({
@@ -47,6 +68,7 @@ class RoomController {
       });
     }
     try {
+      const seats = generateSeats(rows, cols, aisleCols, doubleSeatRow);
       let updateRoom = {
         name,
         cinemaId,

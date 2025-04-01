@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 // Rạp chiếu phim
 const CinemaSchema = new Schema({
   name: { type: String, required: true, unique: true },
+  image: { type: String },
   cinemaCode: { type: String, required: true, unique: true },
   location: { type: String, required: true },
   phone: { type: String },
-  rooms: [{ type: Schema.Types.ObjectId, ref: "Room" }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
