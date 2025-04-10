@@ -5,7 +5,8 @@ const roomController = require("../app/controller/RoomController");
 
 // [GET] /api/rooms
 router.get("/", roomController.index);
-
+// [GET] /api/rooms/:idCinemas
+router.get("/:idCinemas", roomController.getRoomsByCinemaId);
 // [DELETE] /api/rooms/:id
 router.delete("/:id", verifyToken, verifyAdmin, roomController.delete);
 // [PUT] /api/rooms/:id

@@ -3,6 +3,8 @@ const router = express.Router();
 const showTimeController = require("../app/controller/ShowtimeController");
 // [GET] /api/movies
 router.get("/", showTimeController.index);
+// [GET] /api/showtimes/room/:roomId
+router.get("/room/:roomId", showTimeController.getShowTimeByRoomId);
 // [DELETE] /api/showtimes/:id
 router.delete("/:id", showTimeController.delete);
 //[PUT] /api/showtimes/:id

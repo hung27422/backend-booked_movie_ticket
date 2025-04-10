@@ -1,8 +1,39 @@
 const { generateSeats } = require("../../utils/seatUtils");
 const Room = require("../models/Room");
 class RoomController {
+  // [GET] api/rooms
   index(req, res) {
     Room.find({})
+      .then((rooms) => {
+        // Xử lý từng room để thêm số hàng và số cột
+        const updatedRooms = rooms.map((room) => {
+          const seats = room.seats;
+          const rows = Math.max(...seats.map((s) => s.position.row)); // Lấy hàng lớn nhất
+          const cols = Math.max(...seats.map((s) => s.position.col)); // Lấy cột lớn nhất
+
+          return {
+            ...room.toObject(), // Chuyển Mongoose document thành Object
+            rows,
+            cols,
+            doubleSeatRow: room.doubleSeatRow || 0, // Số hàng ghế đôi
+            aisleCols: room.aisleCols || [], // Khoảng cách giữa ghế
+          };
+        });
+
+        res.json(updatedRooms);
+      })
+      .catch((error) => {
+        res.status(400).json({ error: error.message });
+      });
+  }
+  // [GET] /api/rooms?cinemaId=<cinemaId>
+  getRoomsByCinemaId(req, res) {
+    const { idCinemas } = req.params; // Lấy cinemaId từ params
+
+    // Nếu có cinemaId, tìm phòng theo cinemaId, ngược lại lấy tất cả các phòng
+    const query = idCinemas ? { cinemaId: idCinemas } : {};
+
+    Room.find(query)
       .then((rooms) => {
         // Xử lý từng room để thêm số hàng và số cột
         const updatedRooms = rooms.map((room) => {

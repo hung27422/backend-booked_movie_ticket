@@ -3,6 +3,8 @@ const router = express.Router();
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
 const cinemaController = require("../app/controller/CinemaController");
 
+// [GET] /api/cinemas/search?name=xxx
+router.get("/search", cinemaController.searchCinemaByName);
 // [GET] /api/cinemas
 router.get("/", cinemaController.index);
 // [DELETE] /api/cinemas/:id

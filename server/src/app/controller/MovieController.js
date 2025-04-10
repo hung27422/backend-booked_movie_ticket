@@ -1,5 +1,26 @@
 const Movie = require("../models/Movie");
 class MovieController {
+  // [GET] /api/movies/search?title=abc
+  async searchMovieByTitle(req, res) {
+    const { title } = req.query;
+
+    if (!title) {
+      return res.status(400).json({ success: false, message: "Missing title query" });
+    }
+
+    try {
+      // Tìm kiếm không phân biệt hoa thường, dùng biểu thức chính quy
+      const movies = await Movie.find({
+        title: { $regex: title, $options: "i" }, // "i" để không phân biệt hoa thường
+      }).populate("user", "username");
+
+      res.json(movies);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  }
+
   //[GET] /api/movie/id
   async getMovieById(req, res) {
     const movieId = req.params.id;
@@ -29,6 +50,7 @@ class MovieController {
         res.status(500).json({ error: "Lỗi server" });
       });
   }
+
   // [POST] /api/movies
   async post(req, res) {
     const {

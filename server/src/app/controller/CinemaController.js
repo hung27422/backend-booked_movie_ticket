@@ -1,6 +1,30 @@
 const Cinema = require("../models/Cinema");
 const Room = require("../models/Room");
 class CinemaController {
+  // [GET] /api/cinemas/search?name=xxx
+  async searchCinemaByName(req, res) {
+    const { name } = req.query;
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Name is required to search",
+      });
+    }
+
+    try {
+      const cinemas = await Cinema.find({
+        name: { $regex: name, $options: "i" }, // tìm gần đúng, không phân biệt hoa thường
+      });
+
+      res.json(cinemas);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
   //[GET] /api/cinemas
   index(req, res) {
     Cinema.find({})
@@ -33,6 +57,7 @@ class CinemaController {
       res.status(400).json({ error: error.message });
     }
   }
+
   // [PUT] /api/cinemas/:id
   async put(req, res) {
     const { id } = req.params;
