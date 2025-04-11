@@ -34,6 +34,88 @@ class ShowTimeController {
         res.status(400).json({ error: error.message });
       });
   }
+  // [GET] /api/showtimes/filter-by-cinema-date?cinemaId=xxx&releaseDate=yyyy-mm-dd
+  async filterByCinemaAndReleaseDate(req, res) {
+    const { cinemaId, releaseDate } = req.query;
+
+    if (!cinemaId || !releaseDate) {
+      return res.status(400).json({ msg: "Thiếu cinemaId hoặc releaseDate" });
+    }
+
+    try {
+      // Populate tất cả movie để kiểm tra ngày phát hành
+      const showtimes = await ShowTime.find({ cinemaId })
+        .populate("movieId")
+        .populate("roomId", "name")
+        .populate("cinemaId", "name location");
+
+      const filtered = showtimes.filter((showtime) => {
+        const movie = showtime.movieId;
+        return movie?.releaseDate?.toISOString().slice(0, 10) === releaseDate;
+      });
+
+      if (!filtered.length) {
+        return res
+          .status(404)
+          .json({ msg: "Không tìm thấy suất chiếu theo rạp và ngày khởi chiếu" });
+      }
+
+      const result = filtered.map((showtime) => ({
+        _id: showtime._id,
+        movie: showtime.movieId, // toàn bộ info movie
+        room: showtime.roomId,
+        cinema: showtime.cinemaId,
+        startTime: showtime.startTime,
+        endTime: showtime.endTime,
+        price: showtime.price,
+        availableSeats: showtime.availableSeats,
+        createdAt: showtime.createdAt,
+        updatedAt: showtime.updatedAt,
+      }));
+
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  // [GET] /api/showtimes/filter?roomId=xxx&movieId=yyy
+  async getShowTimeByRoomAndMovie(req, res) {
+    const { roomId, movieId } = req.query;
+
+    if (!roomId || !movieId) {
+      return res.status(400).json({ msg: "Thiếu roomId hoặc movieId" });
+    }
+
+    try {
+      const showtimes = await ShowTime.find({ roomId, movieId })
+        .populate("movieId", "title")
+        .populate("roomId", "name")
+        .populate("cinemaId", "name");
+
+      if (!showtimes.length) {
+        return res.status(404).json({ msg: "Không tìm thấy suất chiếu cho phòng và phim này" });
+      }
+
+      const formattedShowtimes = showtimes.map((showtime) => ({
+        _id: showtime._id,
+        movie: showtime.movieId,
+        room: showtime.roomId,
+        cinema: showtime.cinemaId,
+        startTime: showtime.startTime,
+        endTime: showtime.endTime,
+        price: showtime.price,
+        availableSeats: showtime.availableSeats,
+        createdAt: showtime.createdAt,
+        updatedAt: showtime.updatedAt,
+      }));
+
+      res.json(formattedShowtimes);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
   // [GET] /api/showtimes/room/:roomId
   async getShowTimeByRoomId(req, res) {
     const { roomId } = req.params;

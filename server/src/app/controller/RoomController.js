@@ -4,6 +4,7 @@ class RoomController {
   // [GET] api/rooms
   index(req, res) {
     Room.find({})
+      .populate("cinemaId", "name") // Lấy thông tin cinemaId
       .then((rooms) => {
         // Xử lý từng room để thêm số hàng và số cột
         const updatedRooms = rooms.map((room) => {
@@ -34,6 +35,7 @@ class RoomController {
     const query = idCinemas ? { cinemaId: idCinemas } : {};
 
     Room.find(query)
+      .populate("cinemaId", "name") // Lấy thông tin cinemaId
       .then((rooms) => {
         // Xử lý từng room để thêm số hàng và số cột
         const updatedRooms = rooms.map((room) => {

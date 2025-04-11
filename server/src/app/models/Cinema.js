@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const CinemaSchema = new Schema({
   name: { type: String, required: true, unique: true },
   image: { type: String },
-  cinemaCode: { type: String, required: true, unique: true },
+  cinemaCode: { type: String, required: true },
   location: { type: String, required: true },
   phone: { type: String },
   createdAt: { type: Date, default: Date.now },

@@ -3,6 +3,10 @@ const router = express.Router();
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
 const cinemaController = require("../app/controller/CinemaController");
 
+// [GET] /api/cinemas/group-by-location
+router.get("/group-by-location", cinemaController.groupByLocation);
+// [GET] /api/cinemas/search-by-location?location=xxx
+router.get("/search-by-location", cinemaController.searchCinemaByLocation);
 // [GET] /api/cinemas/search?name=xxx
 router.get("/search", cinemaController.searchCinemaByName);
 // [GET] /api/cinemas
