@@ -34,6 +34,7 @@ class ShowTimeController {
         res.status(400).json({ error: error.message });
       });
   }
+
   // [GET] /api/showtimes/filter-by-cinema-date?cinemaId=xxx&releaseDate=yyyy-mm-dd
   async filterByCinemaAndReleaseDate(req, res) {
     const { cinemaId, releaseDate } = req.query;
@@ -43,38 +44,69 @@ class ShowTimeController {
     }
 
     try {
-      // Populate tất cả movie để kiểm tra ngày phát hành
+      // 1. Chuẩn hóa inputDate: "2025/04/13" => "2025-04-13"
+      const inputDate = new Date(releaseDate.replace(/\//g, "-"));
+      const startOfDay = new Date(inputDate);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(inputDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      // 2. Tìm showtimes của rạp
       const showtimes = await ShowTime.find({ cinemaId })
         .populate("movieId")
         .populate("roomId", "name")
         .populate("cinemaId", "name location");
 
+      // 3. Lọc suất chiếu theo ngày nhập
       const filtered = showtimes.filter((showtime) => {
         const movie = showtime.movieId;
-        return movie?.releaseDate?.toISOString().slice(0, 10) === releaseDate;
+        if (!movie || !Array.isArray(movie.movieScreenings)) return false;
+
+        // Kiểm tra ngày chiếu có trong movieScreenings
+        const isInScreening = movie.movieScreenings.some((screeningDate) => {
+          const formatted = new Date(screeningDate).toISOString().slice(0, 10);
+          return formatted === inputDate.toISOString().slice(0, 10);
+        });
+
+        // Kiểm tra suất chiếu diễn ra trong ngày nhập
+        const isInSameDay =
+          new Date(showtime.startTime) >= startOfDay && new Date(showtime.startTime) <= endOfDay;
+
+        return isInScreening && isInSameDay;
       });
 
       if (!filtered.length) {
-        return res
-          .status(404)
-          .json({ msg: "Không tìm thấy suất chiếu theo rạp và ngày khởi chiếu" });
+        return res.status(404).json({ msg: "Không tìm thấy suất chiếu theo rạp và ngày chọn" });
       }
 
-      const result = filtered.map((showtime) => ({
-        _id: showtime._id,
-        movie: showtime.movieId, // toàn bộ info movie
-        room: showtime.roomId,
-        cinema: showtime.cinemaId,
-        startTime: showtime.startTime,
-        endTime: showtime.endTime,
-        price: showtime.price,
-        availableSeats: showtime.availableSeats,
-        createdAt: showtime.createdAt,
-        updatedAt: showtime.updatedAt,
-      }));
+      // 4. Gom nhóm theo phim
+      const grouped = {};
+      filtered.forEach((showtime) => {
+        const movieId = showtime.movieId._id.toString();
+        if (!grouped[movieId]) {
+          grouped[movieId] = {
+            _id: movieId,
+            movie: showtime.movieId,
+            cinema: showtime.cinemaId,
+            showtimes: [],
+          };
+        }
 
+        grouped[movieId].showtimes.push({
+          room: showtime.roomId,
+          startTime: showtime.startTime,
+          endTime: showtime.endTime,
+          price: showtime.price,
+          availableSeats: showtime.availableSeats,
+          _id: showtime._id,
+        });
+      });
+
+      const result = Object.values(grouped);
       res.json(result);
     } catch (err) {
+      console.error(err);
       res.status(500).json({ error: err.message });
     }
   }
