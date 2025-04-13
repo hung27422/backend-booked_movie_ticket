@@ -11,7 +11,7 @@ const MovieSchema = new Schema({
   cast: { type: [String] }, // Diễn viên
   poster: { type: String },
   trailer: { type: String },
-  rating: { type: Number }, // Đánh giá 
+  rating: { type: Number }, // Đánh giá
   ageRate: { type: Number }, // Độ tuổi
   country: { type: String }, // Quốc gia
   caption: { type: String }, // Phụ đề
@@ -20,6 +20,8 @@ const MovieSchema = new Schema({
     enum: ["NOWSHOWING", "COMINGSOON", "TEMPORARILYCLOSED"],
     default: "NOWSHOWING",
   },
+  numberMovieScreening: { type: Number, default: 7 }, // Số ngày chiếu
+  movieScreenings: [{ type: Date }], // Mảng chứa các ngày chiếu
   user: { type: Schema.Types.ObjectId, ref: "User" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

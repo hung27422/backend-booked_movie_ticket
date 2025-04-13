@@ -68,8 +68,10 @@ class MovieController {
       country,
       caption,
       status,
+      numberMovieScreening,
     } = req.body;
     const userId = req.userId;
+
     // Simple validation
     if (!title || !description) {
       return res.status(400).json({
@@ -79,6 +81,25 @@ class MovieController {
     }
 
     try {
+      // Tạo mảng movieScreenings
+      let movieScreenings = [];
+      if (numberMovieScreening && releaseDate) {
+        // Đảm bảo releaseDate là định dạng hợp lệ
+        const baseDate = new Date(releaseDate);
+        if (isNaN(baseDate.getTime())) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid releaseDate format",
+          });
+        }
+
+        for (let i = 0; i < numberMovieScreening; i++) {
+          const screeningDate = new Date(baseDate);
+          screeningDate.setDate(baseDate.getDate() + i);
+          movieScreenings.push(screeningDate);
+        }
+      }
+
       const newMovie = new Movie({
         title,
         description,
@@ -95,6 +116,8 @@ class MovieController {
         caption,
         status,
         user: userId,
+        numberMovieScreening,
+        movieScreenings,
       });
 
       await newMovie.save();
@@ -130,16 +153,31 @@ class MovieController {
       country,
       caption,
       status,
+      numberMovieScreening, // Trường mới để cập nhật số lần chiếu
     } = req.body;
-    // Simple validation
+
+    // Kiểm tra dữ liệu đầu vào
     if (!title || !description) {
       return res.status(400).json({
         success: false,
         message: "Title or description is required",
       });
     }
+
     try {
-      let updateMovie = {
+      // Tạo mảng movieScreenings nếu có releaseDate và numberMovieScreening
+      let movieScreenings = [];
+      if (releaseDate && numberMovieScreening > 0) {
+        const startDate = new Date(releaseDate);
+        for (let i = 0; i < numberMovieScreening; i++) {
+          const screeningDate = new Date(startDate);
+          screeningDate.setDate(startDate.getDate() + i); // Tăng từng ngày
+          movieScreenings.push(screeningDate);
+        }
+      }
+
+      // Chuẩn bị object cập nhật
+      const updateMovie = {
         title,
         description,
         duration,
@@ -154,20 +192,25 @@ class MovieController {
         country,
         caption,
         status,
+        numberMovieScreening,
+        movieScreenings, // Thêm lịch chiếu mới
       };
+
       const movieUpdateCondition = { _id: id };
-      updateMovie = await Movie.findOneAndUpdate(movieUpdateCondition, updateMovie, { new: true });
-      //User not authorised to update movie or movie not found
-      if (!updateMovie) {
+      const updatedMovie = await Movie.findOneAndUpdate(movieUpdateCondition, updateMovie, {
+        new: true,
+      });
+
+      if (!updatedMovie) {
         return res
           .status(401)
           .json({ success: false, message: "Movie not found or user not authorised" });
       }
-      // Movie updated successfully
+
       res.json({
         success: true,
         message: "Movie updated successfully",
-        movie: updateMovie,
+        movie: updatedMovie,
       });
     } catch (error) {
       console.error(error);
@@ -177,6 +220,7 @@ class MovieController {
       });
     }
   }
+
   // [DELETE] /api/movies/:id
   async delete(req, res) {
     const { id } = req.params;
