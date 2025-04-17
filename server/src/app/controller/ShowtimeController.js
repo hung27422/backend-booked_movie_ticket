@@ -8,7 +8,6 @@ class ShowTimeController {
       .populate("roomId", "name")
       .populate("cinemaId", "name")
       .then((showtimes) => {
-        console.log("Showtimes: ", showtimes);
         // Kiểm tra nếu movieId không được populate, hãy trả về thông báo lỗi
         if (!showtimes.length || !showtimes[0].movieId) {
           return res.status(400).json({ msg: "Không thể lấy dữ liệu movie" });
@@ -24,6 +23,7 @@ class ShowTimeController {
           endTime: showtime.endTime,
           price: showtime.price,
           availableSeats: showtime.availableSeats,
+          seatPricing: showtime.seatPricing,
           createdAt: showtime.createdAt,
           updatedAt: showtime.updatedAt,
         }));
@@ -33,6 +33,37 @@ class ShowTimeController {
       .catch((error) => {
         res.status(400).json({ error: error.message });
       });
+  }
+  // [GET] /api/showtimes/:id
+  async getShowTimeById(req, res) {
+    const { id } = req.params;
+
+    try {
+      const showtime = await ShowTime.findById(id)
+        .populate("movieId", "title")
+        .populate("roomId", "name")
+        .populate("cinemaId", "name");
+
+      if (!showtime) {
+        return res.status(404).json({ msg: "Không tìm thấy suất chiếu với ID đã cho" });
+      }
+
+      res.json({
+        _id: showtime._id,
+        movie: showtime.movieId,
+        room: showtime.roomId,
+        cinema: showtime.cinemaId,
+        startTime: showtime.startTime,
+        endTime: showtime.endTime,
+        price: showtime.price,
+        availableSeats: showtime.availableSeats,
+        seatPricing: showtime.seatPricing,
+        createdAt: showtime.createdAt,
+        updatedAt: showtime.updatedAt,
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
 
   // [GET] /api/showtimes/filter-by-cinema-date?cinemaId=xxx&releaseDate=yyyy-mm-dd
@@ -88,7 +119,6 @@ class ShowTimeController {
           grouped[movieId] = {
             _id: movieId,
             movie: showtime.movieId,
-            cinema: showtime.cinemaId,
             showtimes: [],
           };
         }
@@ -99,12 +129,17 @@ class ShowTimeController {
           endTime: showtime.endTime,
           price: showtime.price,
           availableSeats: showtime.availableSeats,
+          seatPricing: showtime.seatPricing,
           _id: showtime._id,
         });
       });
 
-      const result = Object.values(grouped);
-      res.json(result);
+      // ✅ Lấy cinema từ phần tử đầu tiên
+      const cinema = filtered[0]?.cinemaId || null;
+      const data = Object.values(grouped);
+
+      // ✅ Trả về cinema riêng, movie riêng
+      res.json({ cinema, data });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
@@ -138,6 +173,7 @@ class ShowTimeController {
         endTime: showtime.endTime,
         price: showtime.price,
         availableSeats: showtime.availableSeats,
+        seatPricing: showtime.seatPricing,
         createdAt: showtime.createdAt,
         updatedAt: showtime.updatedAt,
       }));
@@ -182,7 +218,8 @@ class ShowTimeController {
 
   // [POST] /api/showtimes
   async post(req, res) {
-    const { movieId, roomId, cinemaId, startTime, endTime, price, availableSeats } = req.body;
+    const { movieId, roomId, cinemaId, startTime, endTime, price, availableSeats, seatPricing } =
+      req.body;
     // Simple validation
     if (!movieId || !cinemaId || !roomId || !startTime || !endTime || !price || !availableSeats) {
       return res.status(400).json({ msg: "Please enter all fields" });
@@ -206,6 +243,7 @@ class ShowTimeController {
         endTime,
         price,
         availableSeats,
+        seatPricing,
       });
       await newShowTime.save();
       // Create new showtime successfully
@@ -217,7 +255,8 @@ class ShowTimeController {
   // [PUT] /api/showtimes/:id
   async put(req, res) {
     const { id } = req.params;
-    const { movieId, roomId, cinemaId, startTime, endTime, price, availableSeats } = req.body;
+    const { movieId, roomId, cinemaId, startTime, endTime, price, availableSeats, seatPricing } =
+      req.body;
     // Simple validation
     if (!movieId || !cinemaId || !roomId || !startTime || !endTime || !price || !availableSeats) {
       return res.status(400).json({ msg: "Please enter all fields" });
@@ -231,6 +270,7 @@ class ShowTimeController {
         endTime,
         price,
         availableSeats,
+        seatPricing,
       };
       const showTimeUpdateCondition = { _id: id };
       updateShowTime = await ShowTime.findOneAndUpdate(showTimeUpdateCondition, updateShowTime, {

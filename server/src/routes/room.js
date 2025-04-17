@@ -3,10 +3,14 @@ const router = express.Router();
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
 const roomController = require("../app/controller/RoomController");
 
+// [GET] /api/rooms/:id
+router.get("/:id", roomController.getRoomById);
+// [GET] /api/rooms/:roomId/details
+router.get("/:roomId/details", roomController.getRoomDetails);
+// [GET] /api/rooms?cinemaId=xxx
+router.get("/", roomController.getRoomsByCinemaId);
 // [GET] /api/rooms
 router.get("/", roomController.index);
-// [GET] /api/rooms/:idCinemas
-router.get("/:idCinemas", roomController.getRoomsByCinemaId);
 // [DELETE] /api/rooms/:id
 router.delete("/:id", verifyToken, verifyAdmin, roomController.delete);
 // [PUT] /api/rooms/:id

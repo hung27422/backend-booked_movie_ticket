@@ -11,7 +11,7 @@ const SeatSchema = new Schema({
 const RoomSchema = new Schema({
   name: { type: String, required: true, unique: true },
   cinemaId: { type: Schema.Types.ObjectId, ref: "Cinema" },
-  seats: { type: [SeatSchema], required: true }, // Danh sách ghế
+  seats: { type: [SeatSchema], required: true }, 
   type: { type: String, enum: ["DEFAULT", "VIP"], default: "DEFAULT" }, // Loại phòng
   doubleSeatRow: { type: [Number], default: [] }, // 🟢 Thêm số hàng ghế đôi
   aisleCols: { type: [String], default: [] }, // 🟢 Thêm khoảng cách ghế

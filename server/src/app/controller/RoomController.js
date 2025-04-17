@@ -1,5 +1,6 @@
 const { generateSeats } = require("../../utils/seatUtils");
 const Room = require("../models/Room");
+const ShowTime = require("../models/Showtime");
 class RoomController {
   // [GET] api/rooms
   index(req, res) {
@@ -27,28 +28,27 @@ class RoomController {
         res.status(400).json({ error: error.message });
       });
   }
+
   // [GET] /api/rooms?cinemaId=<cinemaId>
   getRoomsByCinemaId(req, res) {
-    const { idCinemas } = req.params; // Lấy cinemaId từ params
+    const { cinemaId } = req.query; // ✅ Lấy từ query
 
-    // Nếu có cinemaId, tìm phòng theo cinemaId, ngược lại lấy tất cả các phòng
-    const query = idCinemas ? { cinemaId: idCinemas } : {};
+    const query = cinemaId ? { cinemaId } : {};
 
     Room.find(query)
-      .populate("cinemaId", "name") // Lấy thông tin cinemaId
+      .populate("cinemaId", "name")
       .then((rooms) => {
-        // Xử lý từng room để thêm số hàng và số cột
         const updatedRooms = rooms.map((room) => {
           const seats = room.seats;
-          const rows = Math.max(...seats.map((s) => s.position.row)); // Lấy hàng lớn nhất
-          const cols = Math.max(...seats.map((s) => s.position.col)); // Lấy cột lớn nhất
+          const rows = Math.max(...seats.map((s) => s.position.row));
+          const cols = Math.max(...seats.map((s) => s.position.col));
 
           return {
-            ...room.toObject(), // Chuyển Mongoose document thành Object
+            ...room.toObject(),
             rows,
             cols,
-            doubleSeatRow: room.doubleSeatRow || 0, // Số hàng ghế đôi
-            aisleCols: room.aisleCols || [], // Khoảng cách giữa ghế
+            doubleSeatRow: room.doubleSeatRow || 0,
+            aisleCols: room.aisleCols || [],
           };
         });
 
@@ -57,6 +57,63 @@ class RoomController {
       .catch((error) => {
         res.status(400).json({ error: error.message });
       });
+  }
+
+  // [GET] /api/rooms/:id
+  async getRoomById(req, res) {
+    const { id } = req.params;
+
+    try {
+      const room = await Room.findById(id).populate("cinemaId", "name");
+
+      if (!room) {
+        return res.status(404).json({ success: false, message: "Room not found" });
+      }
+
+      // Tính số hàng và số cột
+      const rows = Math.max(...room.seats.map((s) => s.position.row));
+      const cols = Math.max(...room.seats.map((s) => s.position.col));
+
+      res.json({
+        ...room.toObject(),
+        rows,
+        cols,
+        doubleSeatRow: room.doubleSeatRow || 0,
+        aisleCols: room.aisleCols || [],
+      });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  // [GET] /api/rooms/:roomId/details
+  async getRoomDetails(req, res) {
+    const { roomId } = req.params;
+
+    try {
+      // Tìm thông tin phòng
+      const room = await Room.findById(roomId).populate("cinemaId", "name");
+      if (!room) {
+        return res.status(404).json({ success: false, message: "Room not found" });
+      }
+
+      // Tìm lịch chiếu trong phòng đó
+      const showTimes = await ShowTime.find({ roomId })
+        .populate("movieId", "title duration poster") // Lấy thông tin phim
+        .sort({ startTime: 1 });
+
+      res.json({
+        success: true,
+        room,
+        movies: showTimes.map((show) => ({
+          movie: show.movieId,
+          startTime: show.startTime,
+          showTimeId: show._id,
+        })),
+      });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
   }
 
   // [POST] /api/Rooms
