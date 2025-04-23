@@ -42,7 +42,7 @@ class SnackController {
 
     try {
       const snacks = await Snack.find({ cinemaId });
-      res.json({ success: true, snacks });
+      res.json(snacks);
     } catch (err) {
       console.error(err);
       res.status(500).json({ success: false, message: "Internal Server Error" });
