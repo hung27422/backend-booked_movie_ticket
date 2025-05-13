@@ -1,80 +1,39 @@
 const Payment = require("../models/Payment");
+const { VNPay, ignoreLogger, dateFormat, ProductCode, VnpLocale } = require("vnpay");
+const moment = require("moment");
 
 class PaymentController {
-  //[GET] /api/payments
-  async index(req, res) {
-    Payment.find({})
-      .populate("userId", "username")
-      .populate("bookingId", "totalPrice")
-      .then((data) => {
-        res.json(data);
-      })
-      .catch((error) => {
-        res.status(400).json({ error: error.message });
-      });
-  }
-  // [POST] /api/payments
-  async post(req, res) {
-    const { userId, bookingId, amount, paymentMethod, status } = req.body;
-    // Simple validation
-    if (!userId || !bookingId || !amount || !paymentMethod) {
-      return res.status(400).json({ msg: "Please enter all fields" });
-    }
+  async vnpayPayment(req, res) {
     try {
-      const newPayment = new Payment({
-        userId,
-        bookingId,
-        amount,
-        paymentMethod,
-        status,
+      const vnpay = new VNPay({
+        tmnCode: "V372L6LI",
+        secureSecret: "KD2EDN0J82SN5UUQGV90IPT8XEQXQ9TJ",
+        vnpayHost: "https://sandbox.vnpayment.vn",
+        testMode: true,
+        hashAlgorithm: "SHA512",
+        enableLog: true,
+        loggerFn: ignoreLogger,
       });
-      await newPayment.save();
-      // Create new payment successfully
-      res.json({ success: true, message: "Payment created successfully", payment: newPayment });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  }
-  // [PUT] /api/payments/:id
-  async put(req, res) {
-    const { id } = req.params;
-    const { userId, bookingId, amount, paymentMethod, status } = req.body;
-    // Simple validation
-    if (!userId || !bookingId || !amount || !paymentMethod) {
-      return res.status(400).json({ msg: "Please enter all fields" });
-    }
-    try {
-      let updatePayment = {
-        userId,
-        bookingId,
-        amount,
-        paymentMethod,
-        status,
-      };
-      const paymentUpdateCondition = { _id: id };
 
-      updatePayment = await Payment.findOneAndUpdate(paymentUpdateCondition, updatePayment, {
-        new: true,
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const paymentUrl = await vnpay.buildPaymentUrl({
+        vnp_Amount: 50000,
+        vnp_IpAddr: "127.0.0.1",
+        vnp_TxnRef: "123456",
+        vnp_OrderInfo: "123456",
+        vnp_OrderType: ProductCode.Other,
+        vnp_ReturnUrl: "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b",
+        vnp_Locale: VnpLocale.VN,
+        vnp_CreateDate: dateFormat(new Date()),
+        vnp_ExpireDate: dateFormat(tomorrow),
       });
-      // Update payment successfully
-      res.json({ success: true, message: "Payment updated successfully", payment: updatePayment });
+
+      return res.status(201).json({ success: true, paymentUrl });
     } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  }
-  // [DELETE] /api/payments/:id
-  async delete(req, res) {
-    const { id } = req.params;
-    try {
-      const paymentDeleteCondition = { _id: id };
-      const deletePayment = await Payment.findOneAndDelete(paymentDeleteCondition);
-      if (!deletePayment) {
-        res.json({ success: false, message: "Payment not found" });
-      }
-      // Delete payment successfully
-      res.json({ success: true, message: "Payment deleted successfully", payment: deletePayment });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.error("VNPay error:", error);
+      return res.status(500).json({ success: false, error: "Lỗi khi tạo thanh toán VNPay" });
     }
   }
 }

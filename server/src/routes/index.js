@@ -4,7 +4,7 @@ const cinemaRoute = require("./cinema");
 const roomRoute = require("./room");
 const showTimeRoute = require("./showtime");
 const bookingRoute = require("./booking");
-const paymentRoute = require("./payment");
+const payment = require("./payment");
 const reviewRoute = require("./review");
 const snackRoute = require("./snack");
 const route = (app) => {
@@ -24,8 +24,8 @@ const route = (app) => {
   app.use("/api/showtimes", showTimeRoute);
   // Booking Router
   app.use("/api/bookings", bookingRoute);
-  // Payment Router
-  app.use("/api/payments", paymentRoute);
+  // Payment Momo Router
+  app.use("/api/payment", payment);
   // Review Router
   app.use("/api/reviews", reviewRoute);
   // Snack Router

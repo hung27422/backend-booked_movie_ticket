@@ -1,72 +1,151 @@
 const Booking = require("../models/Booking");
+const Showtime = require("../models/Showtime");
 
 class BookingController {
   //[GET] /api/bookings
   index(req, res) {
     Booking.find({})
       .populate("userId", "username email")
+      .populate("showtimeId")
+      .populate("snacks.snackId")
       .then((bookings) => res.json(bookings))
       .catch((error) => res.status(400).json({ error: error.message }));
   }
+
+  // [GET] /api/bookings/:id
+  async show(req, res) {
+    const { id } = req.params;
+
+    try {
+      const booking = await Booking.findById(id)
+        .populate("userId", "username email")
+        .populate("showtimeId")
+        .populate("snacks.snackId");
+      if (!booking) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy đơn đặt vé" });
+      }
+
+      res.json(booking);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
   // [POST] /api/bookings
   async post(req, res) {
-    const { userId, showtimeId, seatNumbers, totalPrice, status } = req.body;
-    // Simple validation
-    if (!userId || !showtimeId || !seatNumbers) {
-      return res.status(400).json({ msg: "Please enter all fields" });
+    const {
+      userId,
+      showtimeId,
+      seatNumbers,
+      ticketPrice,
+      snacks = [],
+      status = "PENDING",
+    } = req.body;
+
+    if (!userId || !showtimeId || !seatNumbers || !ticketPrice) {
+      return res.status(400).json({ msg: "Vui lòng điền đầy đủ thông tin" });
     }
+
     try {
+      // Tính tổng tiền snack
+      const snacksWithSubtotal = snacks.map((snack) => {
+        const subtotal = snack.quantity * snack.price;
+        return { ...snack, subtotal };
+      });
+
+      // Tổng tiền ghế
+      const seatTotal = seatNumbers.length * ticketPrice;
+
+      // Tổng tiền tất cả
+      const snackTotal = snacksWithSubtotal.reduce((sum, s) => sum + s.subtotal, 0);
+      const totalPrice = seatTotal + snackTotal;
+
       const newBooking = new Booking({
         userId,
         showtimeId,
         seatNumbers,
+        ticketPrice,
+        snacks: snacksWithSubtotal,
         totalPrice,
         status,
       });
+
       await newBooking.save();
-      // Create new booking successfully
-      res.json({ success: true, message: "Booking created successfully", booking: newBooking });
+
+      res.json({
+        success: true,
+        message: "Đặt vé thành công",
+        booking: newBooking,
+      });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   }
+
   // [PUT] /api/bookings/:id
   async put(req, res) {
     const { id } = req.params;
-    const { userId, showtimeId, seatNumbers, totalPrice, status } = req.body;
-    // Simple validation
-    if (!userId || !showtimeId || !seatNumbers) {
-      return res.status(400).json({ msg: "Please enter all fields" });
-    }
-    try {
-      let updateBooking = {
-        userId,
-        showtimeId,
-        seatNumbers,
-        totalPrice,
-        status,
-      };
-      const bookingUpdateCondition = { _id: id };
+    const { userId, showtimeId, seatNumbers, ticketPrice, snacks = [], status } = req.body;
 
-      updateBooking = await Booking.findOneAndUpdate(bookingUpdateCondition, updateBooking, {
-        new: true,
+    if (!userId || !showtimeId || !seatNumbers || !ticketPrice) {
+      return res.status(400).json({ msg: "Vui lòng điền đầy đủ thông tin" });
+    }
+
+    try {
+      const snacksWithSubtotal = snacks.map((snack) => {
+        const subtotal = snack.quantity * snack.price;
+        return { ...snack, subtotal };
       });
-      // Update booking successfully
-      res.json({ success: true, message: "Booking updated successfully", booking: updateBooking });
+
+      const seatTotal = seatNumbers.length * ticketPrice;
+      const snackTotal = snacksWithSubtotal.reduce((sum, s) => sum + s.subtotal, 0);
+      const totalPrice = seatTotal + snackTotal;
+
+      const updatedBooking = await Booking.findByIdAndUpdate(
+        id,
+        {
+          userId,
+          showtimeId,
+          seatNumbers,
+          ticketPrice,
+          snacks: snacksWithSubtotal,
+          totalPrice,
+          status,
+          updatedAt: new Date(),
+        },
+        { new: true }
+      );
+
+      if (!updatedBooking) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy đơn đặt vé" });
+      }
+
+      res.json({
+        success: true,
+        message: "Cập nhật đơn đặt vé thành công",
+        booking: updatedBooking,
+      });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   }
+
   // [DELETE] /api/bookings/:id
   async delete(req, res) {
     const { id } = req.params;
+
     try {
-      const deleteBooking = await Booking.findByIdAndDelete(id);
-      if (!deleteBooking) {
-        res.json({ success: false, message: "Booking not found" });
+      const deletedBooking = await Booking.findByIdAndDelete(id);
+
+      if (!deletedBooking) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy đơn đặt vé" });
       }
-      // Delete booking successfully
-      res.json({ success: true, message: "Booking deleted successfully", booking: deleteBooking });
+
+      res.json({
+        success: true,
+        message: "Xóa đơn đặt vé thành công",
+        booking: deletedBooking,
+      });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
