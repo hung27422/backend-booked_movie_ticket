@@ -4,6 +4,7 @@ const moment = require("moment");
 
 class PaymentController {
   async vnpayPayment(req, res) {
+    const showtimeId = req.body.idShowTime;
     try {
       const vnpay = new VNPay({
         tmnCode: "V372L6LI",
@@ -21,10 +22,10 @@ class PaymentController {
       const paymentUrl = await vnpay.buildPaymentUrl({
         vnp_Amount: 50000,
         vnp_IpAddr: "127.0.0.1",
-        vnp_TxnRef: "123456",
+        vnp_TxnRef: "12345114",
         vnp_OrderInfo: "123456",
         vnp_OrderType: ProductCode.Other,
-        vnp_ReturnUrl: "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b",
+        vnp_ReturnUrl: `http://localhost:3000/pages/book-ticket/${showtimeId}`,
         vnp_Locale: VnpLocale.VN,
         vnp_CreateDate: dateFormat(new Date()),
         vnp_ExpireDate: dateFormat(tomorrow),

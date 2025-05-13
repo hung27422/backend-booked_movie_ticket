@@ -52,14 +52,12 @@ class BookingController {
         const subtotal = snack.quantity * snack.price;
         return { ...snack, subtotal };
       });
-
       // Tổng tiền ghế
       const seatTotal = seatNumbers.length * ticketPrice;
-
       // Tổng tiền tất cả
       const snackTotal = snacksWithSubtotal.reduce((sum, s) => sum + s.subtotal, 0);
       const totalPrice = seatTotal + snackTotal;
-
+      
       const newBooking = new Booking({
         userId,
         showtimeId,

@@ -4,7 +4,7 @@ class ShowTimeController {
   // [GET] /api/showtimes
   index(req, res) {
     ShowTime.find({})
-      .populate("movieId", "title")
+      .populate("movieId", "title caption")
       .populate("roomId", "name")
       .populate("cinemaId", "name")
       .then((showtimes) => {
@@ -40,7 +40,7 @@ class ShowTimeController {
 
     try {
       const showtime = await ShowTime.findById(id)
-        .populate("movieId", "title")
+        .populate("movieId", "title caption")
         .populate("roomId", "name")
         .populate("cinemaId", "name");
 
@@ -85,7 +85,7 @@ class ShowTimeController {
 
       // 2. Tìm showtimes của rạp
       const showtimes = await ShowTime.find({ cinemaId })
-        .populate("movieId")
+        .populate("movieId", "title caption")
         .populate("roomId", "name")
         .populate("cinemaId", "name location");
 
