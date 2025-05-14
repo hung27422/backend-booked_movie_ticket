@@ -85,13 +85,16 @@ class ShowTimeController {
 
       // 2. Tìm showtimes của rạp
       const showtimes = await ShowTime.find({ cinemaId })
-        .populate("movieId", "title caption")
+        .populate("movieId")
         .populate("roomId", "name")
         .populate("cinemaId", "name location");
 
+      console.log("showtimes", showtimes);
       // 3. Lọc suất chiếu theo ngày nhập
       const filtered = showtimes.filter((showtime) => {
         const movie = showtime.movieId;
+        console.log("movie", movie);
+
         if (!movie || !Array.isArray(movie.movieScreenings)) return false;
 
         // Kiểm tra ngày chiếu có trong movieScreenings
@@ -99,13 +102,14 @@ class ShowTimeController {
           const formatted = new Date(screeningDate).toISOString().slice(0, 10);
           return formatted === inputDate.toISOString().slice(0, 10);
         });
-
+        console.log("isInScreening", isInScreening);
         // Kiểm tra suất chiếu diễn ra trong ngày nhập
         const isInSameDay =
           new Date(showtime.startTime) >= startOfDay && new Date(showtime.startTime) <= endOfDay;
 
         return isInScreening && isInSameDay;
       });
+      console.log("filtered:", filtered);
 
       if (!filtered.length) {
         return res.status(404).json({ msg: "Không tìm thấy suất chiếu theo rạp và ngày chọn" });
