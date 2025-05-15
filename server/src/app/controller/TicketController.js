@@ -4,7 +4,7 @@ class TicketController {
   // [GET] /api/tickets
   async index(req, res) {
     try {
-      const tickets = await Ticket.find({});
+      const tickets = await Ticket.find({}).sort({ createdAt: -1 });
       res.json(tickets);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -15,7 +15,7 @@ class TicketController {
   async show(req, res) {
     const { id } = req.params;
     try {
-      const ticket = await Ticket.findById(id);
+      const ticket = await Ticket.findById(id).sort({ createdAt: -1 });
       if (!ticket) {
         return res.status(404).json({ success: false, message: "Không tìm thấy vé" });
       }
@@ -29,21 +29,21 @@ class TicketController {
     const { userId } = req.params;
 
     try {
-      const tickets = await Ticket.find({ userId }).populate("userId", "username email");
+      const tickets = await Ticket.find({ userId })
+        .populate("userId", "username email")
+        .sort({ createdAt: -1 });
 
       if (!tickets || tickets.length === 0) {
         return res
           .status(404)
           .json({ success: false, message: "Không tìm thấy vé của người dùng này" });
       }
-      res.json({
-        success: true,
-        tickets,
-      });
+      res.json(tickets);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   }
+
   // [POST] /api/tickets
   async post(req, res) {
     try {
@@ -53,6 +53,7 @@ class TicketController {
         movieName,
         caption,
         imageMovie,
+        imageCinema,
         codeOrder,
         time,
         date,
@@ -61,19 +62,31 @@ class TicketController {
         snacks,
         cinemaAddress,
         codeTransaction,
+        urlQrCode,
         status,
       } = req.body;
 
       if (!seatNumbers || !codeOrder || !codeTransaction) {
         return res.status(400).json({ success: false, message: "Thiếu thông tin bắt buộc" });
       }
+      // ✅ Kiểm tra xem codeOrder hoặc codeTransaction đã tồn tại chưa
+      const existingTicket = await Ticket.findOne({
+        $or: [{ codeOrder }, { codeTransaction }],
+      });
 
+      if (existingTicket) {
+        return res.status(400).json({
+          success: false,
+          message: "Vé với mã đơn hàng hoặc mã giao dịch đã tồn tại",
+        });
+      }
       const newTicket = new Ticket({
         userId,
         cinemaName,
         movieName,
         caption,
         imageMovie,
+        imageCinema,
         codeOrder,
         time,
         date,
@@ -82,6 +95,7 @@ class TicketController {
         snacks,
         cinemaAddress,
         codeTransaction,
+        urlQrCode,
         status,
       });
 
@@ -106,6 +120,7 @@ class TicketController {
         movieName,
         caption,
         imageMovie,
+        imageCinema,
         codeOrder,
         time,
         date,
@@ -114,6 +129,7 @@ class TicketController {
         snacks,
         cinemaAddress,
         codeTransaction,
+        urlQrCode,
         status,
       } = req.body;
 
@@ -123,6 +139,7 @@ class TicketController {
           userId,
           cinemaName,
           movieName,
+          imageCinema,
           caption,
           imageMovie,
           codeOrder,
@@ -133,6 +150,7 @@ class TicketController {
           snacks,
           cinemaAddress,
           codeTransaction,
+          urlQrCode,
           status,
           updatedAt: new Date(),
         },

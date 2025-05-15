@@ -8,6 +8,7 @@ const TicketSchema = new Schema({
   movieName: { type: String },
   caption: { type: String },
   imageMovie: { type: String },
+  imageCinema: { type: String },
   codeOrder: { type: String }, // Mã vé
   time: { type: String },
   date: { type: String }, // Ngày chiếu
@@ -16,6 +17,7 @@ const TicketSchema = new Schema({
   snacks: { type: String }, // Món ăn kèm
   cinemaAddress: { type: String }, // Địa chỉ rạp
   codeTransaction: { type: String }, // Mã giao dịch
+  urlQrCode: { type: String }, // Mã QR
   status: { type: String, enum: ["PENDING", "CONFIRMED", "CANCELLED"], default: "PENDING" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

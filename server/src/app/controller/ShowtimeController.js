@@ -40,9 +40,9 @@ class ShowTimeController {
 
     try {
       const showtime = await ShowTime.findById(id)
-        .populate("movieId", "title caption")
+        .populate("movieId", "title caption image")
         .populate("roomId", "name")
-        .populate("cinemaId", "name");
+        .populate("cinemaId", "name location image");
 
       if (!showtime) {
         return res.status(404).json({ msg: "Không tìm thấy suất chiếu với ID đã cho" });
@@ -93,7 +93,6 @@ class ShowTimeController {
       // 3. Lọc suất chiếu theo ngày nhập
       const filtered = showtimes.filter((showtime) => {
         const movie = showtime.movieId;
-        console.log("movie", movie);
 
         if (!movie || !Array.isArray(movie.movieScreenings)) return false;
 
@@ -109,7 +108,6 @@ class ShowTimeController {
 
         return isInScreening && isInSameDay;
       });
-      console.log("filtered:", filtered);
 
       if (!filtered.length) {
         return res.status(404).json({ msg: "Không tìm thấy suất chiếu theo rạp và ngày chọn" });
