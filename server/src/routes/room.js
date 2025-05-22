@@ -15,6 +15,8 @@ router.get("/", roomController.index);
 router.delete("/:id", verifyToken, verifyAdmin, roomController.delete);
 // [PUT] /api/rooms/:id
 router.put("/:id", verifyToken, verifyAdmin, roomController.put);
+// [PATCH] /api/rooms/:id/update-seats
+router.patch("/:id/update-seats", roomController.updateBookedSeats);
 // [POST] /api/rooms
 router.post("/", verifyToken, verifyAdmin, roomController.post);
 

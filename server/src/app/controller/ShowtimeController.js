@@ -40,8 +40,8 @@ class ShowTimeController {
 
     try {
       const showtime = await ShowTime.findById(id)
-        .populate("movieId", "title caption image")
-        .populate("roomId", "name")
+        .populate("movieId", "title caption poster")
+        .populate("roomId", "name seats")
         .populate("cinemaId", "name location image");
 
       if (!showtime) {

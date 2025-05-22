@@ -18,6 +18,7 @@ const TicketSchema = new Schema({
   cinemaAddress: { type: String }, // Địa chỉ rạp
   codeTransaction: { type: String }, // Mã giao dịch
   urlQrCode: { type: String }, // Mã QR
+  payDate: { type: String }, // Ngày thanh toán
   status: { type: String, enum: ["PENDING", "CONFIRMED", "CANCELLED"], default: "PENDING" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

@@ -15,7 +15,7 @@ class TicketController {
   async show(req, res) {
     const { id } = req.params;
     try {
-      const ticket = await Ticket.findById(id).sort({ createdAt: -1 });
+      const ticket = await Ticket.findById(id);
       if (!ticket) {
         return res.status(404).json({ success: false, message: "Không tìm thấy vé" });
       }
@@ -63,6 +63,7 @@ class TicketController {
         cinemaAddress,
         codeTransaction,
         urlQrCode,
+        payDate,
         status,
       } = req.body;
 
@@ -96,6 +97,7 @@ class TicketController {
         cinemaAddress,
         codeTransaction,
         urlQrCode,
+        payDate,
         status,
       });
 
@@ -130,6 +132,7 @@ class TicketController {
         cinemaAddress,
         codeTransaction,
         urlQrCode,
+        payDate,
         status,
       } = req.body;
 
@@ -151,6 +154,7 @@ class TicketController {
           cinemaAddress,
           codeTransaction,
           urlQrCode,
+          payDate,
           status,
           updatedAt: new Date(),
         },

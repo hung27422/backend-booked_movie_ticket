@@ -22,7 +22,7 @@ class PaymentController {
       const paymentUrl = await vnpay.buildPaymentUrl({
         vnp_Amount: 50000,
         vnp_IpAddr: "127.0.0.1",
-        vnp_TxnRef: "1234511asasssqq222422",
+        vnp_TxnRef: "123451saszaas2sss12a122q2422",
         vnp_OrderInfo: "123456",
         vnp_OrderType: ProductCode.Other,
         vnp_ReturnUrl: `http://localhost:3000/pages/book-ticket/${showtimeId}`,

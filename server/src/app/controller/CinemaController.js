@@ -47,6 +47,12 @@ class CinemaController {
             address: "$_id",
             total: 1,
             cinemas: 1,
+            cinemas: {
+              $sortArray: {
+                input: "$cinemas",
+                sortBy: { name: 1 }, // sắp xếp theo name A-Z
+              },
+            },
           },
         },
         { $sort: { address: 1 } },

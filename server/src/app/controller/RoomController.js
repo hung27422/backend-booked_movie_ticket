@@ -176,6 +176,45 @@ class RoomController {
       res.status(400).json({ error: error.message });
     }
   }
+  // [PATCH] /api/rooms/:id/update-seats
+  async updateBookedSeats(req, res) {
+    const { id } = req.params; // roomId
+    const { bookedSeats } = req.body; // danh sách các seatNumber cần đặt
+
+    if (!Array.isArray(bookedSeats)) {
+      return res.status(400).json({
+        success: false,
+        message: "bookedSeats must be an array of seat numbers",
+      });
+    }
+
+    try {
+      const room = await Room.findById(id);
+      if (!room) {
+        return res.status(404).json({ success: false, message: "Room not found" });
+      }
+
+      // Cập nhật trạng thái isBooked cho các ghế khớp
+      room.seats = room.seats.map((seat) => {
+        if (bookedSeats.includes(seat.seatNumber)) {
+          return { ...seat.toObject(), isBooked: true };
+        }
+        return seat;
+      });
+
+      room.updatedAt = new Date();
+
+      await room.save();
+
+      res.json({
+        success: true,
+        message: "Seats updated successfully",
+        room,
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
   // [DELETE] /api/rooms/:id
   async delete(req, res) {
     const { id } = req.params;

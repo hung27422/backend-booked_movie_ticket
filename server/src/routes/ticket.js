@@ -5,6 +5,9 @@ const router = express.Router();
 // Route để lấy vé theo id user
 router.get("/user/:userId", TicketController.getTicketByUser);
 
+// Route để lấy vé theo id
+router.get("/:id", TicketController.show);
+
 // Route để lấy tất các vé
 router.get("/", TicketController.index);
 
