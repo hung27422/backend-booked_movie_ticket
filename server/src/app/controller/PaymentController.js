@@ -1,3 +1,4 @@
+const Booking = require("../models/Booking");
 const Payment = require("../models/Payment");
 const { VNPay, ignoreLogger, dateFormat, ProductCode, VnpLocale } = require("vnpay");
 const moment = require("moment");
@@ -5,7 +6,9 @@ const moment = require("moment");
 class PaymentController {
   async vnpayPayment(req, res) {
     const showtimeId = req.body.idShowTime;
+    const bookingId = req.body.idBooking;
     try {
+      const booking = await Booking.findById(bookingId);
       const vnpay = new VNPay({
         tmnCode: "V372L6LI",
         secureSecret: "KD2EDN0J82SN5UUQGV90IPT8XEQXQ9TJ",
@@ -20,10 +23,10 @@ class PaymentController {
       tomorrow.setDate(tomorrow.getDate() + 1);
 
       const paymentUrl = await vnpay.buildPaymentUrl({
-        vnp_Amount: 50000,
+        vnp_Amount: booking.totalPrice,
         vnp_IpAddr: "127.0.0.1",
-        vnp_TxnRef: "123451saszaas2sss12a122q2422",
-        vnp_OrderInfo: "123456",
+        vnp_TxnRef: bookingId.toString(),
+        vnp_OrderInfo: "Vé xem phim Bickie",
         vnp_OrderType: ProductCode.Other,
         vnp_ReturnUrl: `http://localhost:3000/pages/book-ticket/${showtimeId}`,
         vnp_Locale: VnpLocale.VN,
