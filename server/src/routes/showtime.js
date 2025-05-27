@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const showTimeController = require("../app/controller/ShowtimeController");
 
+// [GET] /api/showtime/group-by-location?movieId=xxx
+router.get("/group-by-location", showTimeController.getCinemasByMovieID);
 // [GET] /api/movies
 router.get("/", showTimeController.index);
 // [GET] /api/showtimes/filter-by-cinema-date?cinemaId=xxx&releaseDate=yyyy-mm-dd

@@ -117,6 +117,7 @@ class CinemaController {
       });
     }
   }
+
   //[GET] /api/cinemas
   index(req, res) {
     Cinema.find({})

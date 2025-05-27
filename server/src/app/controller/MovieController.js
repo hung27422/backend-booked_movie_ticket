@@ -50,6 +50,48 @@ class MovieController {
         res.status(500).json({ error: "Lỗi server" });
       });
   }
+  // [GET] /api/movies/status?status=coming_soon
+  async getMoviesByStatus(req, res) {
+    const { status } = req.query;
+
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing status query parameter",
+      });
+    }
+
+    try {
+      const movies = await Movie.find({ status }).populate("user", "username");
+      res.json(movies);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+  // [GET] /api/movies/this-month
+  async getMoviesThisMonth(req, res) {
+    try {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const movies = await Movie.find({
+        releaseDate: {
+          $gte: startOfMonth,
+          $lte: endOfMonth,
+        },
+      }).populate("user", "username");
+
+      res.json(movies);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  }
 
   // [POST] /api/movies
   async post(req, res) {
@@ -135,6 +177,7 @@ class MovieController {
       });
     }
   }
+
   // [PUT] /api/movies/:id
   async put(req, res) {
     const { id } = req.params;

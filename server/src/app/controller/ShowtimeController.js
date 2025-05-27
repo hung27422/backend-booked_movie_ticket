@@ -1,5 +1,5 @@
 const ShowTime = require("../models/Showtime");
-
+const mongoose = require("mongoose");
 class ShowTimeController {
   // [GET] /api/showtimes
   index(req, res) {
@@ -213,6 +213,110 @@ class ShowTimeController {
       }));
 
       res.json(formattedShowtimes);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+  // [GET] /api/showtime/group-by-location?movieId=xxx&location=yyy
+  async getCinemasByMovieID(req, res) {
+    const { movieId, location } = req.query;
+
+    if (!movieId) {
+      return res.status(400).json({ msg: "Thiếu movieId" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(movieId)) {
+      return res.status(400).json({ msg: "movieId không hợp lệ" });
+    }
+
+    try {
+      const pipeline = [
+        { $match: { movieId: new mongoose.Types.ObjectId(movieId) } },
+        {
+          $lookup: {
+            from: "cinemas",
+            localField: "cinemaId",
+            foreignField: "_id",
+            as: "cinema",
+          },
+        },
+        { $unwind: "$cinema" },
+      ];
+
+      // Thêm bước lọc theo location nếu có truyền param location
+      if (location) {
+        pipeline.push({
+          $match: { "cinema.location": location },
+        });
+      }
+
+      pipeline.push(
+        {
+          $group: {
+            _id: "$cinema._id",
+            name: { $first: "$cinema.name" },
+            location: { $first: "$cinema.location" },
+            image: { $first: "$cinema.image" },
+            phone: { $first: "$cinema.phone" },
+            cinemaCode: { $first: "$cinema.cinemaCode" },
+            createdAt: { $first: "$cinema.createdAt" },
+            updatedAt: { $first: "$cinema.updatedAt" },
+            __v: { $first: "$cinema.__v" },
+            countShowtimes: { $sum: 1 },
+            rooms: { $first: "$cinema.rooms" },
+          },
+        },
+        { $sort: { name: 1 } }
+      );
+
+      const cinemasRaw = await ShowTime.aggregate(pipeline);
+
+      if (cinemasRaw.length === 0) {
+        return res.status(404).json({ msg: "Không tìm thấy rạp nào có suất chiếu phim này" });
+      }
+
+      const cinemasGrouped = cinemasRaw.reduce((acc, cinema) => {
+        const foundIndex = acc.findIndex((c) => c.cinemaCode === cinema.cinemaCode);
+        const itemDetail = {
+          _id: cinema._id,
+          name: cinema.name,
+          location: cinema.location,
+          phone: cinema.phone,
+          rooms: cinema.rooms || [],
+          createdAt: cinema.createdAt,
+          updatedAt: cinema.updatedAt,
+          __v: cinema.__v,
+          cinemaCode: cinema.cinemaCode,
+          image: cinema.image,
+        };
+
+        if (foundIndex === -1) {
+          acc.push({
+            cinemaCode: cinema.cinemaCode,
+            count: cinema.countShowtimes,
+            name: cinema.name,
+            image: cinema.image,
+            items: [itemDetail],
+          });
+        } else {
+          acc[foundIndex].count += cinema.countShowtimes;
+          acc[foundIndex].items.push(itemDetail);
+        }
+
+        return acc;
+      }, []);
+
+      const address = cinemasRaw[0]?.location || "Chưa có địa chỉ";
+
+      const result = [
+        {
+          total: cinemasRaw.length,
+          address,
+          cinemas: cinemasGrouped,
+        },
+      ];
+
+      res.json(result);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

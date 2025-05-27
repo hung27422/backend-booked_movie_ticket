@@ -3,6 +3,10 @@ const router = express.Router();
 const movieController = require("../app/controller/MovieController");
 const { verifyAdmin, verifyToken } = require("../middleware/auth");
 
+// [GET]/api/movies/this-month
+router.get("/this-month", movieController.getMoviesThisMonth);
+// [GET] /api/movies/status?status=abc
+router.get("/status", movieController.getMoviesByStatus);
 // [GET] /api/movies/search?title=abc
 router.get("/search", movieController.searchMovieByTitle);
 // [GET] /api/movie/:id

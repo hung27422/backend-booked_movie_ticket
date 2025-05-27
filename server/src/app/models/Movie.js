@@ -17,7 +17,7 @@ const MovieSchema = new Schema({
   caption: { type: String }, // Phụ đề
   status: {
     type: String,
-    enum: ["NOWSHOWING", "COMINGSOON", "TEMPORARILYCLOSED"],
+    enum: ["NOWSHOWING", "COMINGSOON", "EARLYACCESS", "TEMPORARILYCLOSED"],
     default: "NOWSHOWING",
   },
   numberMovieScreening: { type: Number, default: 7 }, // Số ngày chiếu
