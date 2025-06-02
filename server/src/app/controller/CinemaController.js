@@ -1,6 +1,28 @@
 const Cinema = require("../models/Cinema");
 const Room = require("../models/Room");
 class CinemaController {
+  // [GET] /api/cinemas/:id
+  async getById(req, res) {
+    const { id } = req.params;
+
+    try {
+      const cinema = await Cinema.findById(id);
+      if (!cinema) {
+        return res.status(404).json({
+          success: false,
+          message: "Cinema not found",
+        });
+      }
+
+      res.status(200).json(cinema);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
   // [GET] /api/cinemas/group-by-location?location=xxx
   async groupByLocation(req, res) {
     const { location } = req.query;

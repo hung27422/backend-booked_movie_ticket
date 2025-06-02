@@ -24,12 +24,20 @@ class TicketController {
       res.status(400).json({ error: error.message });
     }
   }
-  // [GET] /api/tickets/user/:userId
+  // [GET] /api/tickets/user/:userId?status=PAID
   async getTicketByUser(req, res) {
     const { userId } = req.params;
+    const { status } = req.query; // lấy status từ query params
 
     try {
-      const tickets = await Ticket.find({ userId })
+      // Tạo filter object
+      const filter = { userId };
+
+      if (status) {
+        filter.status = status; // thêm điều kiện lọc status nếu có
+      }
+
+      const tickets = await Ticket.find(filter)
         .populate("userId", "username email")
         .sort({ createdAt: -1 });
 
@@ -72,13 +80,25 @@ class TicketController {
       }
       // ✅ Kiểm tra xem codeOrder hoặc codeTransaction đã tồn tại chưa
       const existingTicket = await Ticket.findOne({
-        $or: [{ codeOrder }, { codeTransaction }],
+        $or: [{ codeOrder }],
+      });
+      const existingSeatNumber = await Ticket.findOne({
+        $or: [{ seatNumbers }],
+        status: { $ne: "CANCELLED" },
       });
 
       if (existingTicket) {
         return res.status(400).json({
           success: false,
           message: "Vé với mã đơn hàng hoặc mã giao dịch đã tồn tại",
+        });
+      }
+      // Xử lý seatNumbers dù là string hay array
+
+      if (existingSeatNumber) {
+        return res.status(400).json({
+          success: false,
+          message: "Một hoặc nhiều ghế đã được đặt cho suất chiếu này",
         });
       }
       const newTicket = new Ticket({

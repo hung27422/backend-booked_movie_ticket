@@ -119,7 +119,6 @@ class UserController {
         }
       );
       const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN);
-      console.log("Decoded JWT:", decoded);
       res.json({
         success: true,
         message: "Login successful",

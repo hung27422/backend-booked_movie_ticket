@@ -57,7 +57,7 @@ class BookingController {
       // Tổng tiền tất cả
       const snackTotal = snacksWithSubtotal.reduce((sum, s) => sum + s.subtotal, 0);
       const totalPrice = seatTotal + snackTotal;
-      
+
       const newBooking = new Booking({
         userId,
         showtimeId,
@@ -121,6 +121,35 @@ class BookingController {
       res.json({
         success: true,
         message: "Cập nhật đơn đặt vé thành công",
+        booking: updatedBooking,
+      });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+  // [PATCH] /api/bookings/:id/status
+  async updateStatus(req, res) {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ msg: "Vui lòng cung cấp trạng thái mới" });
+    }
+
+    try {
+      const updatedBooking = await Booking.findByIdAndUpdate(
+        id,
+        { status, updatedAt: new Date() },
+        { new: true }
+      );
+
+      if (!updatedBooking) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy đơn đặt vé" });
+      }
+
+      res.json({
+        success: true,
+        message: "Cập nhật trạng thái thành công",
         booking: updatedBooking,
       });
     } catch (error) {

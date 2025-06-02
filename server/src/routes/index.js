@@ -8,6 +8,7 @@ const payment = require("./payment");
 const reviewRoute = require("./review");
 const snackRoute = require("./snack");
 const ticketRoute = require("./ticket");
+const statisticsRouter = require("./statistics");
 const route = (app) => {
   //Home Router
   app.get("/", (req, res) => {
@@ -33,5 +34,7 @@ const route = (app) => {
   app.use("/api/snacks", snackRoute);
   // Ticket Router
   app.use("/api/tickets", ticketRoute);
+  // statisticsRouter
+  app.use("/api/statistics", statisticsRouter);
 };
 module.exports = route;

@@ -89,7 +89,6 @@ class ShowTimeController {
         .populate("roomId", "name")
         .populate("cinemaId", "name location");
 
-      console.log("showtimes", showtimes);
       // 3. Lọc suất chiếu theo ngày nhập
       const filtered = showtimes.filter((showtime) => {
         const movie = showtime.movieId;
@@ -101,7 +100,6 @@ class ShowTimeController {
           const formatted = new Date(screeningDate).toISOString().slice(0, 10);
           return formatted === inputDate.toISOString().slice(0, 10);
         });
-        console.log("isInScreening", isInScreening);
         // Kiểm tra suất chiếu diễn ra trong ngày nhập
         const isInSameDay =
           new Date(showtime.startTime) >= startOfDay && new Date(showtime.startTime) <= endOfDay;
@@ -390,6 +388,42 @@ class ShowTimeController {
         success: true,
         message: "ShowTime Updated Successfully",
         showTime: updateShowTime,
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+  // [PATCH] /api/showtimes/:id/available-seats
+  async updateAvailableSeats(req, res) {
+    const { id } = req.params;
+    const { totalSeats, bookedSeats } = req.body;
+
+    // Validate input
+    if (typeof totalSeats !== "number" || typeof bookedSeats !== "number") {
+      return res.status(400).json({ msg: "totalSeats and bookedSeats must be numbers" });
+    }
+
+    const availableSeats = totalSeats - bookedSeats;
+
+    if (availableSeats < 0) {
+      return res.status(400).json({ msg: "Booked seats cannot be greater than total seats" });
+    }
+
+    try {
+      const updatedShowTime = await ShowTime.findByIdAndUpdate(
+        id,
+        { availableSeats },
+        { new: true }
+      );
+
+      if (!updatedShowTime) {
+        return res.status(404).json({ success: false, message: "ShowTime not found" });
+      }
+
+      res.json({
+        success: true,
+        message: "Available seats updated successfully",
+        showTime: updatedShowTime,
       });
     } catch (err) {
       res.status(500).json({ error: err.message });

@@ -18,6 +18,8 @@ router.get("/room/:roomId", showTimeController.getShowTimeByRoomId);
 router.delete("/:id", showTimeController.delete);
 //[PUT] /api/showtimes/:id
 router.put("/:id", showTimeController.put);
+// [PATCH] /api/showtimes/:id/available-seats
+router.patch("/:id/available-seats", showTimeController.updateAvailableSeats);
 // [POST] /api/showtimes
 router.post("/", showTimeController.post);
 

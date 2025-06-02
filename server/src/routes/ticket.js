@@ -2,7 +2,7 @@ const express = require("express");
 const TicketController = require("../app/controller/TicketController");
 const router = express.Router();
 
-// Route để lấy vé theo id user
+// Route để lấy vé theo id user và status
 router.get("/user/:userId", TicketController.getTicketByUser);
 
 // Route để lấy vé theo id

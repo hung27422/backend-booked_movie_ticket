@@ -5,6 +5,8 @@ const cinemaController = require("../app/controller/CinemaController");
 
 // [GET] /api/cinemas/group-by-location
 router.get("/group-by-location", cinemaController.groupByLocation);
+// [GET] /api/cinemas/:id
+router.get("/:id", cinemaController.getById);
 // [GET] /api/cinemas/search-by-location?location=xxx
 router.get("/search-by-location", cinemaController.searchCinemaByLocation);
 // [GET] /api/cinemas/search?name=xxx
