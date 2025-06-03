@@ -6,14 +6,21 @@ class ShowTimeController {
     ShowTime.find({})
       .populate("movieId", "title caption")
       .populate("roomId", "name")
-      .populate("cinemaId", "name")
+      .populate("cinemaId", "name") // cần trường name để sort
+      .lean()
       .then((showtimes) => {
-        // Kiểm tra nếu movieId không được populate, hãy trả về thông báo lỗi
         if (!showtimes.length || !showtimes[0].movieId) {
           return res.status(400).json({ msg: "Không thể lấy dữ liệu movie" });
         }
 
-        // Chỉ giữ lại movie trong response
+        // ✅ Sắp xếp showtimes theo tên rạp (cinemaId.name)
+        showtimes.sort((a, b) => {
+          const nameA = a.cinemaId?.name?.toLowerCase() || "";
+          const nameB = b.cinemaId?.name?.toLowerCase() || "";
+          return nameA.localeCompare(nameB); // tăng dần (A -> Z), dùng -1 để giảm dần
+        });
+
+        // ✅ Định dạng dữ liệu
         const formattedShowtimes = showtimes.map((showtime) => ({
           _id: showtime._id,
           movie: showtime.movieId,
@@ -34,6 +41,7 @@ class ShowTimeController {
         res.status(400).json({ error: error.message });
       });
   }
+
   // [GET] /api/showtimes/:id
   async getShowTimeById(req, res) {
     const { id } = req.params;
@@ -68,14 +76,13 @@ class ShowTimeController {
 
   // [GET] /api/showtimes/filter-by-cinema-date?cinemaId=xxx&releaseDate=yyyy-mm-dd
   async filterByCinemaAndReleaseDate(req, res) {
-    const { cinemaId, releaseDate } = req.query;
+    const { cinemaId, releaseDate, idMovie } = req.query;
 
     if (!cinemaId || !releaseDate) {
       return res.status(400).json({ msg: "Thiếu cinemaId hoặc releaseDate" });
     }
 
     try {
-      // 1. Chuẩn hóa inputDate: "2025/04/13" => "2025-04-13"
       const inputDate = new Date(releaseDate.replace(/\//g, "-"));
       const startOfDay = new Date(inputDate);
       startOfDay.setHours(0, 0, 0, 0);
@@ -83,24 +90,27 @@ class ShowTimeController {
       const endOfDay = new Date(inputDate);
       endOfDay.setHours(23, 59, 59, 999);
 
-      // 2. Tìm showtimes của rạp
-      const showtimes = await ShowTime.find({ cinemaId })
+      // ✅ 1. Tìm showtimes của rạp (không lọc theo idMovie ở đây)
+      let showtimes = await ShowTime.find({ cinemaId })
         .populate("movieId")
         .populate("roomId", "name")
         .populate("cinemaId", "name location");
 
-      // 3. Lọc suất chiếu theo ngày nhập
+      // ✅ 2. Nếu có idMovie thì chỉ giữ showtimes của phim đó
+      if (idMovie) {
+        showtimes = showtimes.filter((showtime) => showtime.movieId?._id?.toString() === idMovie);
+      }
+
+      // ✅ 3. Lọc suất chiếu theo ngày nhập và ngày chiếu nằm trong movieScreenings
       const filtered = showtimes.filter((showtime) => {
         const movie = showtime.movieId;
-
         if (!movie || !Array.isArray(movie.movieScreenings)) return false;
 
-        // Kiểm tra ngày chiếu có trong movieScreenings
         const isInScreening = movie.movieScreenings.some((screeningDate) => {
           const formatted = new Date(screeningDate).toISOString().slice(0, 10);
           return formatted === inputDate.toISOString().slice(0, 10);
         });
-        // Kiểm tra suất chiếu diễn ra trong ngày nhập
+
         const isInSameDay =
           new Date(showtime.startTime) >= startOfDay && new Date(showtime.startTime) <= endOfDay;
 
@@ -111,7 +121,6 @@ class ShowTimeController {
         return res.status(404).json({ msg: "Không tìm thấy suất chiếu theo rạp và ngày chọn" });
       }
 
-      // 4. Gom nhóm theo phim
       const grouped = {};
       filtered.forEach((showtime) => {
         const movieId = showtime.movieId._id.toString();
@@ -134,11 +143,9 @@ class ShowTimeController {
         });
       });
 
-      // ✅ Lấy cinema từ phần tử đầu tiên
       const cinema = filtered[0]?.cinemaId || null;
       const data = Object.values(grouped);
 
-      // ✅ Trả về cinema riêng, movie riêng
       res.json({ cinema, data });
     } catch (err) {
       console.error(err);
@@ -391,6 +398,38 @@ class ShowTimeController {
       });
     } catch (err) {
       res.status(500).json({ error: err.message });
+    }
+  }
+  // [PUT] /api/showtimes/update-same-time
+  async updateShowTimesSameTime(req, res) {
+    const { ids, startTime, endTime } = req.body;
+
+    // Kiểm tra dữ liệu đầu vào
+    if (
+      !Array.isArray(ids) ||
+      !ids.every((id) => mongoose.Types.ObjectId.isValid(id)) ||
+      !startTime ||
+      !endTime ||
+      isNaN(new Date(startTime)) ||
+      isNaN(new Date(endTime))
+    ) {
+      return res.status(400).json({ msg: "Dữ liệu không hợp lệ" });
+    }
+
+    try {
+      const result = await ShowTime.updateMany(
+        { _id: { $in: ids } },
+        {
+          $set: {
+            startTime: new Date(startTime),
+            endTime: new Date(endTime),
+          },
+        }
+      );
+
+      res.json({ msg: "Cập nhật thành công", result });
+    } catch (err) {
+      res.status(500).json({ msg: "Lỗi server", error: err.message });
     }
   }
   // [PATCH] /api/showtimes/:id/available-seats
