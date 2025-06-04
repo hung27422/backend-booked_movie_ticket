@@ -3,7 +3,10 @@ const SnackController = require("../app/controller/SnackController");
 const router = express.Router();
 
 // Route để lấy tất cả snack
-router.get("/", SnackController.getAllSnacks);
+router.get("/getAll", SnackController.getAllSnacks);
+
+//[GET] /api/snacks?page=1&limit=10
+router.get("/", SnackController.getSnacksByPageAndLimit);
 
 // Tạo snack mới cho rạp
 router.post("/", SnackController.createSnack);

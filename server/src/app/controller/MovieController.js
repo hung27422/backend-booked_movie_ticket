@@ -50,6 +50,31 @@ class MovieController {
         res.status(500).json({ error: "Lỗi server" });
       });
   }
+  // [GET] /api/movies?page=1&limit=10
+  getByPageAndLimit(req, res) {
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại
+    const limit = parseInt(req.query.limit) || 10; // Số phim mỗi trang
+    const skip = (page - 1) * limit;
+
+    Movie.find({})
+      .skip(skip)
+      .limit(limit)
+      .populate("user", "username")
+      .then(async (movies) => {
+        const totalMovies = await Movie.countDocuments();
+        res.json({
+          data: movies,
+          currentPage: page,
+          totalPages: Math.ceil(totalMovies / limit),
+          totalMovies,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: "Lỗi server" });
+      });
+  }
+
   // [GET] /api/movies/status?status=coming_soon
   async getMoviesByStatus(req, res) {
     const { status } = req.query;

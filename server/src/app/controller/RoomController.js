@@ -28,6 +28,46 @@ class RoomController {
         res.status(400).json({ error: error.message });
       });
   }
+  // [GET] /api/rooms?page=1&limit=10
+  getRoomByPageAndLimit(req, res) {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    Promise.all([
+      Room.find({}).populate("cinemaId", "name").skip(skip).limit(limit),
+      Room.countDocuments(),
+    ])
+      .then(([rooms, totalItems]) => {
+        // Xử lý từng room để thêm rows và cols
+        const updatedRooms = rooms.map((room) => {
+          const seats = room.seats || [];
+          const rows = Math.max(...seats.map((s) => s.position.row), 0);
+          const cols = Math.max(...seats.map((s) => s.position.col), 0);
+
+          return {
+            ...room.toObject(),
+            rows,
+            cols,
+            doubleSeatRow: room.doubleSeatRow || 0,
+            aisleCols: room.aisleCols || [],
+          };
+        });
+
+        const totalPages = Math.ceil(totalItems / limit);
+
+        res.json({
+          data: updatedRooms,
+          currentPage: page,
+          totalPages,
+          totalItems,
+        });
+      })
+      .catch((error) => {
+        console.error("Lỗi lấy danh sách phòng:", error);
+        res.status(400).json({ error: error.message });
+      });
+  }
 
   // [GET] /api/rooms?cinemaId=<cinemaId>
   getRoomsByCinemaId(req, res) {

@@ -43,6 +43,60 @@ class ShowTimeController {
         res.status(400).json({ error: error.message });
       });
   }
+  // [GET] api/showtimes?page=1&limit=10
+  getShowTimeByPageAndLimit(req, res) {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    ShowTime.find({})
+      .populate("movieId", "title caption")
+      .populate("roomId", "name")
+      .populate("cinemaId", "name")
+      .lean()
+      .then(async (showtimes) => {
+        if (!showtimes.length || !showtimes[0].movieId) {
+          return res.status(400).json({ msg: "Không thể lấy dữ liệu movie" });
+        }
+
+        // Sort theo tên rạp
+        const sorted = showtimes.sort((a, b) => {
+          const nameA = a.cinemaId?.name?.toLowerCase() || "";
+          const nameB = b.cinemaId?.name?.toLowerCase() || "";
+          return nameA.localeCompare(nameB); // tăng dần A-Z
+        });
+
+        const total = sorted.length;
+        const totalPage = Math.ceil(total / limit);
+
+        const paginatedData = sorted.slice(skip, skip + limit);
+
+        const formattedShowtimes = paginatedData.map((showtime) => ({
+          _id: showtime._id,
+          movie: showtime.movieId,
+          room: showtime.roomId,
+          cinema: showtime.cinemaId,
+          startTime: showtime.startTime,
+          endTime: showtime.endTime,
+          price: showtime.price,
+          availableSeats: showtime.availableSeats,
+          seatPricing: showtime.seatPricing,
+          createdAt: showtime.createdAt,
+          updatedAt: showtime.updatedAt,
+        }));
+
+        res.json({
+          data: formattedShowtimes,
+          total,
+          page,
+          limit,
+          totalPage,
+        });
+      })
+      .catch((error) => {
+        res.status(400).json({ error: error.message });
+      });
+  }
 
   // [GET] /api/showtimes/:id
   async getShowTimeById(req, res) {

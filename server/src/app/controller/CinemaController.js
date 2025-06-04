@@ -143,9 +143,38 @@ class CinemaController {
   //[GET] /api/cinemas
   index(req, res) {
     Cinema.find({})
+      .sort({ cinemaCode: 1, name: 1 }) // Sắp xếp theo cinemaCode, sau đó theo name
       .then((cinemas) => res.json(cinemas))
       .catch((error) => res.status(400).json({ error: error.message }));
   }
+  // [GET] /api/cinemas?page=1&limit=10
+  getCinemaByPageAndLimit(req, res) {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    Promise.all([
+      Cinema.find({})
+        .sort({ cinemaCode: 1, name: 1 }) // Sắp xếp theo cinemaCode và name
+        .skip(skip)
+        .limit(limit),
+      Cinema.countDocuments(),
+    ])
+      .then(([cinemas, totalItems]) => {
+        const totalPages = Math.ceil(totalItems / limit);
+        res.json({
+          data: cinemas,
+          currentPage: page,
+          totalPages,
+          totalItems,
+        });
+      })
+      .catch((error) => {
+        console.error("Lỗi lấy danh sách rạp:", error);
+        res.status(400).json({ error: error.message });
+      });
+  }
+
   // [POST] /api/cinemas
   async post(req, res) {
     const { name, cinemaCode, image, location, phone } = req.body;

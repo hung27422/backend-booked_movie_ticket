@@ -4,8 +4,10 @@ const showTimeController = require("../app/controller/ShowtimeController");
 
 // [GET] /api/showtime/group-by-location?movieId=xxx
 router.get("/group-by-location", showTimeController.getCinemasByMovieID);
-// [GET] /api/movies
-router.get("/", showTimeController.index);
+// [GET] /api/showtimes/getAll
+router.get("/getAll", showTimeController.index);
+//  [GET] api/showtimes?page=1&limit=10
+router.get("/", showTimeController.getShowTimeByPageAndLimit);
 // [GET] /api/showtimes/filter-by-cinema-date?cinemaId=xxx&releaseDate=yyyy-mm-dd
 router.get("/filter-by-cinema-date", showTimeController.filterByCinemaAndReleaseDate);
 // [GET] /api/showtimes/filter?roomId=xxx&movieId=yyy

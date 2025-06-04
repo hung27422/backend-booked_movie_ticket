@@ -11,6 +11,33 @@ class SnackController {
       res.status(500).json({ success: false, message: "Internal Server Error" });
     }
   }
+  // [GET] /api/snacks?page=1&limit=10
+  async getSnacksByPageAndLimit(req, res) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      const [snacks, total] = await Promise.all([
+        Snack.find({}).populate("cinemaId", "name").skip(skip).limit(limit).lean(),
+        Snack.countDocuments(),
+      ]);
+
+      const totalPage = Math.ceil(total / limit);
+
+      res.json({
+        data: snacks,
+        total,
+        page,
+        limit,
+        totalPage,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+  }
+
   // [POST] /api/snacks
   async createSnack(req, res) {
     const { name, description, type, price, cinemaId } = req.body;
