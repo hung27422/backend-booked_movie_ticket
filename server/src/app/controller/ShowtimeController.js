@@ -1,4 +1,6 @@
 const ShowTime = require("../models/Showtime");
+const Movie = require("../models/Movie");
+const Room = require("../models/Room");
 const mongoose = require("mongoose");
 class ShowTimeController {
   // [GET] /api/showtimes
@@ -120,7 +122,7 @@ class ShowTimeController {
       if (!filtered.length) {
         return res.status(404).json({ msg: "Không tìm thấy suất chiếu theo rạp và ngày chọn" });
       }
-
+      filtered.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
       const grouped = {};
       filtered.forEach((showtime) => {
         const movieId = showtime.movieId._id.toString();
@@ -326,106 +328,160 @@ class ShowTimeController {
       res.status(500).json({ error: err.message });
     }
   }
-
-  // [POST] /api/showtimes
+  // [POST] api/showtimes
   async post(req, res) {
-    const { movieId, roomId, cinemaId, startTime, endTime, price, availableSeats, seatPricing } =
-      req.body;
-    // Simple validation
-    if (!movieId || !cinemaId || !roomId || !startTime || !endTime || !price || !availableSeats) {
-      return res.status(400).json({ msg: "Please enter all fields" });
+    const { movieId, roomId, cinemaId, startTime, price, seatPricing } = req.body;
+
+    if (!movieId || !cinemaId || !roomId || !startTime || !price) {
+      return res.status(400).json({ msg: "Please enter all required fields" });
     }
+
     try {
-      // Kiểm tra trùng giờ trong cùng phòng
+      const movie = await Movie.findById(movieId);
+      if (!movie) return res.status(404).json({ msg: "Movie not found" });
+
+      const room = await Room.findById(roomId);
+      if (!room) return res.status(404).json({ msg: "Room not found" });
+
+      const availableSeats = room.seats.filter((seat) => seat.isBooked === false).length;
+
+      const durationMinutes = movie.duration;
+      const start = new Date(startTime);
+      const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
+
       const isOverlapping = await ShowTime.findOne({
         roomId,
-        $or: [
-          { startTime: { $lt: endTime }, endTime: { $gt: startTime } }, // Trùng khoảng thời gian
-        ],
+        $or: [{ startTime: { $lt: end }, endTime: { $gt: start } }],
       });
+
       if (isOverlapping) {
         return res.status(400).json({ msg: "ShowTime overlaps with another existing showtime" });
       }
+
       const newShowTime = new ShowTime({
         movieId,
         roomId,
         cinemaId,
-        startTime,
-        endTime,
+        startTime: start,
+        endTime: end,
         price,
         availableSeats,
         seatPricing,
       });
+
       await newShowTime.save();
-      // Create new showtime successfully
+
       res.json({ success: true, message: "ShowTime Created Successfully", showTime: newShowTime });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   }
-  // [PUT] /api/showtimes/:id
+  // [PUT] api/showtimes/:id
   async put(req, res) {
     const { id } = req.params;
-    const { movieId, roomId, cinemaId, startTime, endTime, price, availableSeats, seatPricing } =
-      req.body;
-    // Simple validation
-    if (!movieId || !cinemaId || !roomId || !startTime || !endTime || !price || !availableSeats) {
+    const { movieId, roomId, cinemaId, startTime, price, seatPricing } = req.body;
+
+    if (!movieId || !cinemaId || !roomId || !startTime || !price) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
+
     try {
-      let updateShowTime = {
-        movieId,
+      const movie = await Movie.findById(movieId);
+      if (!movie) return res.status(404).json({ msg: "Movie not found" });
+
+      const room = await Room.findById(roomId);
+      if (!room) return res.status(404).json({ msg: "Room not found" });
+
+      const durationMinutes = movie.duration;
+      const start = new Date(startTime);
+      const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
+
+      // Kiểm tra trùng lịch, loại trừ chính showtime đang update
+      const isOverlapping = await ShowTime.findOne({
+        _id: { $ne: id },
         roomId,
-        cinemaId,
-        startTime,
-        endTime,
-        price,
-        availableSeats,
-        seatPricing,
-      };
-      const showTimeUpdateCondition = { _id: id };
-      updateShowTime = await ShowTime.findOneAndUpdate(showTimeUpdateCondition, updateShowTime, {
-        new: true,
+        $or: [{ startTime: { $lt: end }, endTime: { $gt: start } }],
       });
-      if (!updateShowTime) {
-        return res.status(404).json({ success: false, message: "Room not found" });
+
+      if (isOverlapping) {
+        return res.status(400).json({ msg: "ShowTime overlaps with another existing showtime" });
       }
-      // Update showtime successfully
+
+      const availableSeats = room.seats.filter((seat) => seat.isBooked === false).length;
+
+      const updatedShowTime = await ShowTime.findOneAndUpdate(
+        { _id: id },
+        {
+          movieId,
+          roomId,
+          cinemaId,
+          startTime: start,
+          endTime: end,
+          price,
+          availableSeats,
+          seatPricing,
+        },
+        { new: true }
+      );
+
+      if (!updatedShowTime) {
+        return res.status(404).json({ success: false, message: "ShowTime not found" });
+      }
+
       res.json({
         success: true,
         message: "ShowTime Updated Successfully",
-        showTime: updateShowTime,
+        showTime: updatedShowTime,
       });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   }
-  // [PUT] /api/showtimes/update-same-time
-  async updateShowTimesSameTime(req, res) {
-    const { ids, startTime, endTime } = req.body;
 
-    // Kiểm tra dữ liệu đầu vào
+  // [PUT] /api/showtimes/update-same-time
+
+  async updateShowTimesSameTime(req, res) {
+    const { ids, startTime } = req.body;
+
+    // Kiểm tra đầu vào
     if (
       !Array.isArray(ids) ||
       !ids.every((id) => mongoose.Types.ObjectId.isValid(id)) ||
       !startTime ||
-      !endTime ||
-      isNaN(new Date(startTime)) ||
-      isNaN(new Date(endTime))
+      isNaN(new Date(startTime))
     ) {
       return res.status(400).json({ msg: "Dữ liệu không hợp lệ" });
     }
 
     try {
-      const result = await ShowTime.updateMany(
-        { _id: { $in: ids } },
-        {
-          $set: {
-            startTime: new Date(startTime),
-            endTime: new Date(endTime),
+      const showtimes = await ShowTime.find({ _id: { $in: ids } }).populate("movieId");
+
+      if (!showtimes.length) {
+        return res.status(404).json({ msg: "Không tìm thấy suất chiếu nào để cập nhật" });
+      }
+
+      const start = new Date(startTime);
+
+      // Tính lại từng endTime theo duration của movie
+      const bulkUpdates = showtimes.map((showtime) => {
+        const movie = showtime.movieId;
+        const duration = movie?.duration || 0;
+        const end = new Date(start.getTime() + duration * 60 * 1000);
+
+        return {
+          updateOne: {
+            filter: { _id: showtime._id },
+            update: {
+              $set: {
+                startTime: start,
+                endTime: end,
+              },
+            },
           },
-        }
-      );
+        };
+      });
+
+      const result = await ShowTime.bulkWrite(bulkUpdates);
 
       res.json({ msg: "Cập nhật thành công", result });
     } catch (err) {
@@ -468,6 +524,7 @@ class ShowTimeController {
       res.status(500).json({ error: err.message });
     }
   }
+
   // [DELETE] /api/showtimes/:id
   async delete(req, res) {
     const { id } = req.params;
