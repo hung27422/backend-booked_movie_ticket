@@ -10,10 +10,11 @@ router.get("/this-month", movieController.getMoviesThisMonth);
 router.get("/status", movieController.getMoviesByStatus);
 // [GET] /api/movies/search?title=abc
 router.get("/search", movieController.searchMovieByTitle);
-// [GET] /api/movie/:id
-router.get("/:id", movieController.getMovieById);
 // [GET] /api/movies
 router.get("/", movieController.getByPageAndLimit);
+
+// [GET] /api/movie/:id
+router.get("/:id", movieController.getMovieById);
 //[DELETE] /api/movies/:id
 router.delete("/:id", verifyToken, verifyAdmin, movieController.delete);
 // [PUT] /api/movies/:id
