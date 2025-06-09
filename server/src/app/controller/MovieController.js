@@ -46,7 +46,7 @@ class MovieController {
       .populate("user", "username")
       .then((movies) => res.json(movies)) // ✅ Return list movie
       .catch((err) => {
-        console.error(err);
+        console.error("Lỗi:", error);
         res.status(500).json({ error: "Lỗi server" });
       });
   }
