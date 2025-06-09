@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const serverless = require("serverless-http");
 const port = 5000;
 
 const route = require("./src/routes/index");
@@ -16,7 +15,6 @@ db.connect();
 // Routes init
 route(app);
 
-// app.listen(port, () => {
-//   console.log(`Example app listening on port ${port}`);
-// });
-module.exports.handler = serverless(app);
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
