@@ -28,7 +28,7 @@ class PaymentController {
         vnp_TxnRef: bookingId.toString(),
         vnp_OrderInfo: "Vé xem phim Bickie",
         vnp_OrderType: ProductCode.Other,
-        vnp_ReturnUrl: `http://localhost:3000/pages/book-ticket/${showtimeId}`,
+        vnp_ReturnUrl: `https://bickie.vercel.app/pages/book-ticket/${showtimeId}`,
         vnp_Locale: VnpLocale.VN,
         vnp_CreateDate: dateFormat(new Date()),
         vnp_ExpireDate: dateFormat(tomorrow),
