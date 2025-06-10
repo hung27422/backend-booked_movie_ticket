@@ -85,7 +85,7 @@ class StatisticsController {
 
       const bookings = await Booking.find({
         createdAt: { $gte: from, $lte: to },
-        status: { $in: ["PENDING", "CONFIRMED"] },
+        status: { $in: ["CONFIRMED"] },
       }).populate({
         path: "showtimeId",
         populate: { path: "movieId" },
