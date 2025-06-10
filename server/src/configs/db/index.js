@@ -3,11 +3,7 @@ const mongoose = require("mongoose");
 async function connect() {
   try {
     await mongoose.connect(
-      "mongodb+srv://tanhungho2002:Aa123456789!@booked-movies-ticket-de.0pdhu76.mongodb.net/booked_movies_ticket-dev-clt?retryWrites=true&w=majority&appName=booked-movies-ticket-dev",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
+      "mongodb+srv://tanhungho2002:Aa123456789!@booked-movies-ticket-de.0pdhu76.mongodb.net/booked_movies_ticket-dev-clt?retryWrites=true&w=majority&appName=booked-movies-ticket-dev"
     );
     console.log("Connect Mongoose successfully!!!");
   } catch (error) {

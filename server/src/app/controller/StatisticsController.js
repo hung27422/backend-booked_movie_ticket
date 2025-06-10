@@ -44,11 +44,63 @@ class StatisticsController {
 
       const showtimes = await Showtime.find({
         startTime: { $gte: from, $lte: to },
-      }).populate("roomId");
+      }).populate({
+        path: "roomId",
+        select: "seats name",
+      });
 
-      const totalSeats = showtimes.reduce((sum, s) => sum + (s.roomId?.totalSeats || 0), 0);
-      const emptySeats = totalSeats - totalTicketsSold;
+      const confirmedBookings = await Booking.find({
+        createdAt: { $gte: from, $lte: to },
+        status: "CONFIRMED",
+      }).populate("showtimeId");
 
+      const roomStatsMap = {}; // { roomId_dateKey: { emptySeats: x, date, roomId, roomName } }
+
+      for (const showtime of showtimes) {
+        const roomId = showtime.roomId?._id?.toString();
+        const roomName = showtime.roomId?.name || "Không rõ";
+
+        // Lấy ngày của suất chiếu (YYYY-MM-DD)
+        const date = new Date(showtime.startTime);
+        const dateKey = date.toISOString().split("T")[0]; // "2025-06-10"
+
+        const mapKey = `${roomId}_${dateKey}`;
+
+        const totalSeats = showtime.roomId?.seats?.length || 0;
+
+        // Tính số ghế đã đặt trong suất chiếu này
+        const showtimeBookings = confirmedBookings.filter(
+          (b) => b.showtimeId?._id.toString() === showtime._id.toString()
+        );
+
+        let bookedCount = 0;
+        showtimeBookings.forEach((b) => {
+          bookedCount += b.seatNumbers?.length || 0;
+        });
+
+        if (!roomStatsMap[mapKey]) {
+          roomStatsMap[mapKey] = {
+            date: dateKey,
+            roomId,
+            roomName,
+            totalSeats,
+            bookedSeats: bookedCount,
+          };
+        } else {
+          // Nếu trong cùng ngày có nhiều suất ở cùng phòng, cộng dồn ghế đã đặt
+          roomStatsMap[mapKey].bookedSeats += bookedCount;
+        }
+      }
+
+      const roomStats = Object.values(roomStatsMap).map((stat) => ({
+        date: stat.date,
+        roomId: stat.roomId,
+        roomName: stat.roomName,
+        totalSeats: stat.totalSeats,
+        bookedSeats: stat.bookedSeats,
+        emptySeats: stat.totalSeats - stat.bookedSeats,
+      }));
+      const emptySeatsCount = roomStats.reduce((sum, stat) => sum + stat.emptySeats, 0);
       res.json({
         success: true,
         data: {
@@ -56,7 +108,7 @@ class StatisticsController {
           to,
           totalRevenue,
           totalTicketsSold,
-          emptySeats,
+          emptySeats: emptySeatsCount,
           totalShowtimes: showtimes.length,
         },
       });

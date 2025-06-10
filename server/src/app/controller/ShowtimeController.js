@@ -7,7 +7,7 @@ class ShowTimeController {
   index(req, res) {
     ShowTime.find({})
       .populate("movieId", "title caption")
-      .populate("roomId", "name")
+      .populate("roomId", "name seats")
       .populate("cinemaId", "name") // cần trường name để sort
       .lean()
       .then((showtimes) => {
@@ -51,7 +51,7 @@ class ShowTimeController {
 
     ShowTime.find({})
       .populate("movieId", "title caption")
-      .populate("roomId", "name")
+      .populate("roomId", "name seats")
       .populate("cinemaId", "name")
       .lean()
       .then(async (showtimes) => {
@@ -220,7 +220,7 @@ class ShowTimeController {
     try {
       const showtimes = await ShowTime.find({ roomId, movieId })
         .populate("movieId", "title")
-        .populate("roomId", "name")
+        .populate("roomId", "name seats")
         .populate("cinemaId", "name");
 
       if (!showtimes.length) {
@@ -253,7 +253,7 @@ class ShowTimeController {
     try {
       const showtimes = await ShowTime.find({ roomId })
         .populate("movieId", "title")
-        .populate("roomId", "name")
+        .populate("roomId", "name seats")
         .populate("cinemaId", "name");
 
       if (!showtimes.length) {
